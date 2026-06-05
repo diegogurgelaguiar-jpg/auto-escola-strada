@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { questionCategories } from "../config/site";
 import { demoQuestions } from "../data/demoQuestions";
 import { hasSupabaseConfig, supabase } from "../lib/supabase";
@@ -7,6 +7,7 @@ import { useAuth } from "../state/AuthContext";
 
 export default function Simulado() {
   const { session } = useAuth();
+
   const [mode, setMode] = useState("completo");
   const [category, setCategory] = useState("Legislação");
   const [started, setStarted] = useState(false);
@@ -15,27 +16,55 @@ export default function Simulado() {
   const [finished, setFinished] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const score = useMemo(() => calculateScore(questions, answers), [questions, answers]);
+  const score = useMemo(
+    () => calculateScore(questions, answers),
+    [questions, answers]
+  );
 
   async function startQuiz() {
     let source = demoQuestions;
 
     if (hasSupabaseConfig) {
-      let query = supabase.from("questions").select("*").eq("is_active", true);
+      let query = supabase
+        .from("questions")
+        .select("*")
+        .eq("is_active", true);
 
       if (mode === "categoria") {
         query = query.eq("category", category);
       }
 
-      const { data } = await query;
+      const { data, error } = await query;
 
-      if (data?.length) source = data;
+      console.log("Modo:", mode);
+      console.log("Perguntas recebidas:", data?.length);
+      console.log("Erro:", error);
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      source = data || [];
     } else if (mode === "categoria") {
-      source = demoQuestions.filter((q) => q.category === category);
+      source = demoQuestions.filter(
+        (q) => q.category === category
+      );
     }
 
     const size = getQuizSize(mode);
-    setQuestions(shuffle(source).slice(0, size));
+
+    console.log("Quantidade solicitada:", size);
+    console.log("Quantidade disponível:", source.length);
+
+    const quizQuestions = shuffle(source).slice(0, size);
+
+    console.log(
+      "Perguntas do simulado:",
+      quizQuestions.length
+    );
+
+    setQuestions(quizQuestions);
     setAnswers({});
     setFinished(false);
     setSaved(false);
@@ -45,7 +74,9 @@ export default function Simulado() {
   async function finishQuiz() {
     setFinished(true);
 
-    if (!hasSupabaseConfig || !session?.user?.id || saved) return;
+    if (!hasSupabaseConfig || !session?.user?.id || saved) {
+      return;
+    }
 
     await supabase.from("quiz_attempts").insert({
       user_id: session.user.id,
@@ -67,29 +98,53 @@ export default function Simulado() {
         <div className="section-title">
           <span>Simulado</span>
           <h1>Escolha o modo de prova.</h1>
-          <p>Depois de iniciar, as perguntas são sorteadas automaticamente.</p>
+          <p>
+            Depois de iniciar, as perguntas são sorteadas
+            automaticamente.
+          </p>
         </div>
 
         <div className="quiz-settings card">
           <label>
             Modo do simulado
-            <select value={mode} onChange={(e) => setMode(e.target.value)}>
-              <option value="rapido">Rápido — 10 perguntas</option>
-              <option value="completo">Completo — até 30 perguntas</option>
-              <option value="categoria">Por categoria — 15 perguntas</option>
+            <select
+              value={mode}
+              onChange={(e) => setMode(e.target.value)}
+            >
+              <option value="rapido">
+                Rápido — 10 perguntas
+              </option>
+              <option value="completo">
+                Completo — até 30 perguntas
+              </option>
+              <option value="categoria">
+                Por categoria — 15 perguntas
+              </option>
             </select>
           </label>
 
           {mode === "categoria" && (
             <label>
               Categoria
-              <select value={category} onChange={(e) => setCategory(e.target.value)}>
-                {questionCategories.map((item) => <option key={item}>{item}</option>)}
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                {questionCategories.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
               </select>
             </label>
           )}
 
-          <button className="btn primary" onClick={startQuiz}>Iniciar simulado</button>
+          <button
+            className="btn primary"
+            onClick={startQuiz}
+          >
+            Iniciar simulado
+          </button>
         </div>
       </section>
     );
@@ -100,27 +155,57 @@ export default function Simulado() {
       <div className="section-title">
         <span>Simulado</span>
         <h1>Prova teórica online</h1>
-        <p>Responda todas as perguntas para liberar o resultado final.</p>
+        <p>
+          Responda todas as perguntas para liberar o resultado
+          final.
+        </p>
       </div>
 
       {finished && (
-        <div className={`result-box ${score.passed ? "approved" : "failed"}`}>
-          <h2>{score.passed ? "Aprovado no treino" : "Continue estudando"}</h2>
-          <p>Você acertou {score.correct} de {questions.length}. Aproveitamento: {score.percentage}%.</p>
-          <button className="btn secondary" onClick={() => setStarted(false)}>Fazer outro simulado</button>
+        <div
+          className={`result-box ${
+            score.passed ? "approved" : "failed"
+          }`}
+        >
+          <h2>
+            {score.passed
+              ? "Aprovado no treino"
+              : "Continue estudando"}
+          </h2>
+
+          <p>
+            Você acertou {score.correct} de{" "}
+            {questions.length}. Aproveitamento:{" "}
+            {score.percentage}%.
+          </p>
+
+          <button
+            className="btn secondary"
+            onClick={() => setStarted(false)}
+          >
+            Fazer outro simulado
+          </button>
         </div>
       )}
 
       <div className="questions-list">
         {questions.map((question, index) => {
           const selected = answers[question.id];
-          const isCorrect = selected === question.correct_option;
+          const isCorrect =
+            selected === question.correct_option;
 
           return (
-            <article className="question-card" key={question.id}>
+            <article
+              className="question-card"
+              key={question.id}
+            >
               <div className="question-top">
                 <span>{index + 1}</span>
-                <small>{question.category} · {question.difficulty || "normal"}</small>
+
+                <small>
+                  {question.category} ·{" "}
+                  {question.difficulty || "normal"}
+                </small>
               </div>
 
               <h3>{question.question}</h3>
@@ -130,8 +215,15 @@ export default function Simulado() {
                   key={option}
                   className={[
                     "option",
-                    finished && option === question.correct_option ? "correct" : "",
-                    finished && selected === option && !isCorrect ? "wrong" : ""
+                    finished &&
+                    option === question.correct_option
+                      ? "correct"
+                      : "",
+                    finished &&
+                    selected === option &&
+                    !isCorrect
+                      ? "wrong"
+                      : ""
                   ].join(" ")}
                 >
                   <input
@@ -140,16 +232,31 @@ export default function Simulado() {
                     value={option}
                     disabled={finished}
                     checked={selected === option}
-                    onChange={() => setAnswers({ ...answers, [question.id]: option })}
+                    onChange={() =>
+                      setAnswers({
+                        ...answers,
+                        [question.id]: option
+                      })
+                    }
                   />
+
                   <strong>{option}</strong>
-                  <span>{question[`option_${option.toLowerCase()}`]}</span>
+
+                  <span>
+                    {
+                      question[
+                        `option_${option.toLowerCase()}`
+                      ]
+                    }
+                  </span>
                 </label>
               ))}
 
               {finished && (
                 <p className="explanation">
-                  <strong>Explicação:</strong> {question.explanation || "Revise este conteúdo no material teórico."}
+                  <strong>Explicação:</strong>{" "}
+                  {question.explanation ||
+                    "Revise este conteúdo no material teórico."}
                 </p>
               )}
             </article>
@@ -159,8 +266,19 @@ export default function Simulado() {
 
       {!finished && (
         <div className="sticky-actions">
-          <span>{Object.keys(answers).length} de {questions.length} respondidas</span>
-          <button className="btn primary" onClick={finishQuiz} disabled={Object.keys(answers).length < questions.length}>
+          <span>
+            {Object.keys(answers).length} de{" "}
+            {questions.length} respondidas
+          </span>
+
+          <button
+            className="btn primary"
+            onClick={finishQuiz}
+            disabled={
+              Object.keys(answers).length <
+              questions.length
+            }
+          >
             Finalizar prova
           </button>
         </div>
@@ -168,5 +286,3 @@ export default function Simulado() {
     </section>
   );
 }
-
-
