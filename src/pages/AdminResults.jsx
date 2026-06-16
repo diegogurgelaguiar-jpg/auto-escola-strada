@@ -1,24 +1,60 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { hasSupabaseConfig, supabase } from "../lib/supabase";
 
 export default function AdminResults() {
   const [attempts, setAttempts] = useState([]);
+  const [profiles, setProfiles] = useState([]);
+  const [search, setSearch] = useState("");
+  const [message, setMessage] = useState("");
 
-  useEffect(() => {
-    async function load() {
-      if (!hasSupabaseConfig) return;
+  async function loadData() {
+    if (!hasSupabaseConfig) return;
 
-      const { data } = await supabase
-        .from("quiz_attempts")
-        .select("*, profiles:user_id(full_name,email)")
-        .order("created_at", { ascending: false })
-        .limit(100);
+    const attemptsResponse = await supabase
+      .from("quiz_attempts")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(200);
 
-      setAttempts(data || []);
+    if (attemptsResponse.error) {
+      setMessage(attemptsResponse.error.message);
+      return;
     }
 
-    load();
+    const profilesResponse = await supabase
+      .from("profiles")
+      .select("id, full_name, email");
+
+    if (profilesResponse.error) {
+      setMessage(profilesResponse.error.message);
+      return;
+    }
+
+    setAttempts(attemptsResponse.data || []);
+    setProfiles(profilesResponse.data || []);
+  }
+
+  useEffect(() => {
+    loadData();
   }, []);
+
+  function getProfile(userId) {
+    return profiles.find((profile) => profile.id === userId);
+  }
+
+  const filteredAttempts = useMemo(() => {
+    const term = search.trim().toLowerCase();
+
+    if (!term) return attempts;
+
+    return attempts.filter((attempt) => {
+      const profile = getProfile(attempt.user_id);
+      const name = String(profile?.full_name || "").toLowerCase();
+      const email = String(profile?.email || "").toLowerCase();
+
+      return name.includes(term) || email.includes(term);
+    });
+  }, [attempts, profiles, search]);
 
   return (
     <section className="page">
@@ -28,8 +64,21 @@ export default function AdminResults() {
         <p>Acompanhe as últimas tentativas feitas na área do aluno.</p>
       </div>
 
+      <div className="card form">
+        <label>
+          Pesquisar aluno
+          <input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Digite nome ou e-mail"
+          />
+        </label>
+      </div>
+
+      {message && <p className="message">{message}</p>}
+
       <div className="table-card">
-        {attempts.length === 0 ? (
+        {filteredAttempts.length === 0 ? (
           <p>Nenhum resultado encontrado.</p>
         ) : (
           <table>
@@ -42,16 +91,23 @@ export default function AdminResults() {
                 <th>%</th>
               </tr>
             </thead>
+
             <tbody>
-              {attempts.map((attempt) => (
-                <tr key={attempt.id}>
-                  <td>{attempt.profiles?.full_name || attempt.profiles?.email || "Aluno"}</td>
-                  <td>{new Date(attempt.created_at).toLocaleString("pt-BR")}</td>
-                  <td>{attempt.mode}</td>
-                  <td>{attempt.correct_answers}/{attempt.total_questions}</td>
-                  <td>{attempt.percentage}%</td>
-                </tr>
-              ))}
+              {filteredAttempts.map((attempt) => {
+                const profile = getProfile(attempt.user_id);
+
+                return (
+                  <tr key={attempt.id}>
+                    <td>{profile?.full_name || "Aluno sem nome"}</td>
+                    <td>{new Date(attempt.created_at).toLocaleString("pt-BR")}</td>
+                    <td>{attempt.mode}</td>
+                    <td>
+                      {attempt.correct_answers}/{attempt.total_questions}
+                    </td>
+                    <td>{attempt.percentage}%</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
@@ -59,5 +115,3 @@ export default function AdminResults() {
     </section>
   );
 }
-
-

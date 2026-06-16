@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import "./styles.css";
@@ -16,6 +16,8 @@ import Simulado from "./pages/Simulado";
 import Results from "./pages/Results";
 import Admin from "./pages/Admin";
 import AdminResults from "./pages/AdminResults";
+import AdminUsers from "./pages/AdminUsers";
+import AdminCreateUser from "./pages/AdminCreateUser";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
@@ -35,12 +37,68 @@ createRoot(document.getElementById("root")).render(
             <Route path="/privacidade" element={<Privacy />} />
             <Route path="/termos" element={<Terms />} />
 
-            <Route path="/aluno" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
-            <Route path="/aluno/simulado" element={<ProtectedRoute><Simulado /></ProtectedRoute>} />
-            <Route path="/aluno/resultados" element={<ProtectedRoute><Results /></ProtectedRoute>} />
+            <Route
+              path="/aluno"
+              element={
+                <ProtectedRoute>
+                  <StudentDashboard />
+                </ProtectedRoute>
+              }
+            />
 
-            <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
-            <Route path="/admin/resultados" element={<AdminRoute><AdminResults /></AdminRoute>} />
+            <Route
+              path="/aluno/simulado"
+              element={
+                <ProtectedRoute>
+                  <Simulado />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/aluno/resultados"
+              element={
+                <ProtectedRoute>
+                  <Results />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin"
+              element={
+                <AdminRoute>
+                  <Admin />
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="/admin/resultados"
+              element={
+                <AdminRoute>
+                  <AdminResults />
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="/admin/usuarios"
+              element={
+                <AdminRoute>
+                  <AdminUsers />
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="/admin/novo-usuario"
+              element={
+                <AdminRoute>
+                  <AdminCreateUser />
+                </AdminRoute>
+              }
+            />
 
             <Route path="/404" element={<NotFound />} />
             <Route path="*" element={<Navigate to="/404" replace />} />
@@ -50,4 +108,3 @@ createRoot(document.getElementById("root")).render(
     </BrowserRouter>
   </React.StrictMode>
 );
-

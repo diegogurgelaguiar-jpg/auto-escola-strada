@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
-import { hasSupabaseConfig } from "../lib/supabase";
+import { hasSupabaseConfig, supabase } from "../lib/supabase";
 import { useAuth } from "../state/AuthContext";
 
 export default function Login() {
-  const { session, signIn, signUp } = useAuth();
-  const [mode, setMode] = useState("login");
-  const [fullName, setFullName] = useState("");
+  const { session, signIn } = useAuth();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [recoverMode, setRecoverMode] = useState(false);
 
   if (session) return <Navigate to="/aluno" replace />;
 
@@ -18,29 +18,55 @@ export default function Login() {
     setMessage("");
 
     try {
-      const response = mode === "login"
-        ? await signIn(email, password)
-        : await signUp(fullName, email, password);
+      const response = await signIn(email, password);
 
       if (response.error) {
         setMessage(response.error.message);
         return;
-      }
-
-      if (mode === "register") {
-        setMessage("Cadastro criado. Se a confirmação por e-mail estiver ativa, confirme antes de entrar.");
       }
     } catch (error) {
       setMessage(error.message);
     }
   }
 
+  async function handlePasswordRecovery(event) {
+    event.preventDefault();
+    setMessage("");
+
+    if (!hasSupabaseConfig || !supabase) {
+      setMessage("Supabase não configurado.");
+      return;
+    }
+
+    if (!email) {
+      setMessage("Digite seu e-mail para recuperar a senha.");
+      return;
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/login`,
+    });
+
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+
+    setMessage("Enviamos um e-mail com o link para redefinir sua senha.");
+  }
+
   return (
     <section className="auth-page">
       <div className="auth-card">
         <span className="badge">Área do aluno</span>
-        <h1>{mode === "login" ? "Entrar" : "Criar cadastro"}</h1>
-        <p>Acesso para simulados, resultados e acompanhamento de desempenho.</p>
+
+        <h1>{recoverMode ? "Recuperar senha" : "Entrar"}</h1>
+
+        <p>
+          {recoverMode
+            ? "Digite seu e-mail para receber o link de redefinição de senha."
+            : "Acesso exclusivo para alunos cadastrados pela Auto Escola Strada."}
+        </p>
 
         {!hasSupabaseConfig && (
           <div className="notice">
@@ -48,37 +74,72 @@ export default function Login() {
           </div>
         )}
 
-        <form className="form" onSubmit={handleSubmit}>
-          {mode === "register" && (
+        {recoverMode ? (
+          <form className="form" onSubmit={handlePasswordRecovery}>
             <label>
-              Nome completo
-              <input value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+              E-mail
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </label>
-          )}
 
-          <label>
-            E-mail
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          </label>
+            {message && <p className="message">{message}</p>}
 
-          <label>
-            Senha
-            <input type="password" minLength="6" value={password} onChange={(e) => setPassword(e.target.value)} required />
-          </label>
+            <button className="btn primary" type="submit">
+              Enviar link de recuperação
+            </button>
+          </form>
+        ) : (
+          <form className="form" onSubmit={handleSubmit}>
+            <label>
+              E-mail
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </label>
 
-          {message && <p className="message">{message}</p>}
+            <label>
+              Senha
+              <input
+                type="password"
+                minLength="6"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </label>
 
-          <button className="btn primary" type="submit">
-            {mode === "login" ? "Entrar na área do aluno" : "Cadastrar aluno"}
-          </button>
-        </form>
+            {message && <p className="message">{message}</p>}
 
-        <button className="link-button center" onClick={() => setMode(mode === "login" ? "register" : "login")}>
-          {mode === "login" ? "Criar novo cadastro" : "Já tenho cadastro"}
+            <button className="btn primary" type="submit">
+              Entrar na área do aluno
+            </button>
+          </form>
+        )}
+
+        <button
+          className="link-button center"
+          type="button"
+          onClick={() => {
+            setMessage("");
+            setRecoverMode(!recoverMode);
+          }}
+        >
+          {recoverMode ? "Voltar para login" : "Esqueci minha senha"}
         </button>
+
+        {!recoverMode && (
+          <p className="muted center">
+            Não tem acesso? Solicite seu cadastro diretamente na autoescola.
+          </p>
+        )}
       </div>
     </section>
   );
 }
-
-

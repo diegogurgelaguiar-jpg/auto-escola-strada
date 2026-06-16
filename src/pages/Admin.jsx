@@ -106,6 +106,9 @@ export default function Admin() {
         <h1>Painel administrativo profissional.</h1>
         <p>Cadastre, edite e exclua perguntas do simulado.</p>
         <Link className="btn secondary" to="/admin/resultados">Ver resultados dos alunos</Link>
+        <Link className="btn secondary" to="/admin/usuarios">
+  Gerenciar usuários
+</Link>
       </div>
 
       <div className="admin-grid">

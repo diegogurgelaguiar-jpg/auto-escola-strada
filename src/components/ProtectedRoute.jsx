@@ -5,8 +5,6 @@ import { useAuth } from "../state/AuthContext";
 export function ProtectedRoute({ children }) {
   const { session, loading } = useAuth();
 
-  // Se já existe sessão, libera a página mesmo se o loading ainda estiver true.
-  // Isso evita a Área do Aluno ficar presa em "Carregando...".
   if (session) {
     return children;
   }
@@ -23,9 +21,10 @@ export function ProtectedRoute({ children }) {
 }
 
 export function AdminRoute({ children }) {
-  const { session, loading, isAdmin, profile } = useAuth();
+  const { session, loading, isAdmin } = useAuth();
 
-  if (!session && loading) {
+  // Loading geral
+  if (loading) {
     return (
       <section className="page">
         <div className="card">Carregando...</div>
@@ -33,22 +32,16 @@ export function AdminRoute({ children }) {
     );
   }
 
+  // Sem login
   if (!session) {
     return <Navigate to="/login" replace />;
   }
 
-  // Enquanto o perfil carrega, deixa aparecer uma mensagem curta.
-  if (!profile && loading) {
-    return (
-      <section className="page">
-        <div className="card">Carregando perfil de administrador...</div>
-      </section>
-    );
-  }
-
+  // Não é admin
   if (!isAdmin) {
     return <Navigate to="/aluno" replace />;
   }
 
+  // OK
   return children;
 }
