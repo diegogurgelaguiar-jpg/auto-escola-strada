@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { hasSupabaseConfig, supabase } from "../lib/supabase";
 import { useAuth } from "../state/AuthContext";
+import Brand from "../components/Brand";
 
 export default function Login() {
   const { session, signIn } = useAuth();
@@ -58,6 +59,7 @@ export default function Login() {
   return (
     <section className="auth-page">
       <div className="auth-card">
+        <Brand compact />
         <span className="badge">Área do aluno</span>
 
         <h1>{recoverMode ? "Recuperar senha" : "Entrar"}</h1>

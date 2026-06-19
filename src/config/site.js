@@ -1,12 +1,14 @@
 export const siteConfig = {
   name: "Auto Escola Strada",
-  slogan: "Sua CNH começa aqui",
-  description: "Autoescola com atendimento profissional, área do aluno e simulado teórico online.",
-  address: "Endereço da autoescola",
-  hours: "Segunda a sexta, das 8h às 18h",
+  slogan: "Qualidade, segurança e confiança",
+  description: "Formação completa para categorias A, B, C, D e E, com pista própria para motos e acompanhamento em cada etapa da sua CNH.",
+  address: "Av. Padre Pedro Pinto, 2244 - Venda Nova, Belo Horizonte/MG",
+  phone: "(31) 3451-3969",
+  hours: "Consulte nossos horários pelo WhatsApp",
   instagram: "#",
-  whatsapp: import.meta.env.VITE_WHATSAPP_NUMBER || "5599999999999",
-  siteUrl: import.meta.env.VITE_SITE_URL || "https://seudominio.com.br"
+  whatsapp: "553134513969",
+  mapsUrl: "https://www.google.com/maps/search/?api=1&query=Av.%20Padre%20Pedro%20Pinto%2C%202244%2C%20Venda%20Nova%2C%20Belo%20Horizonte%2FMG",
+  siteUrl: import.meta.env.VITE_SITE_URL || (typeof window !== "undefined" ? window.location.origin : "")
 };
 
 export const questionCategories = [

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { BarChart3, ChevronRight, UsersRound } from "lucide-react";
 import { questionCategories } from "../config/site";
 import { hasSupabaseConfig, supabase } from "../lib/supabase";
 import { useAuth } from "../state/AuthContext";
@@ -105,10 +106,28 @@ export default function Admin() {
         <span>Admin</span>
         <h1>Painel administrativo profissional.</h1>
         <p>Cadastre, edite e exclua perguntas do simulado.</p>
-        <Link className="btn secondary" to="/admin/resultados">Ver resultados dos alunos</Link>
-        <Link className="btn secondary" to="/admin/usuarios">
-  Gerenciar usuários
-</Link>
+      </div>
+
+      <div className="admin-shortcuts">
+        <Link className="admin-shortcut results" to="/admin/resultados">
+          <span className="admin-shortcut-icon"><BarChart3 /></span>
+          <span className="admin-shortcut-copy">
+            <small>Desempenho</small>
+            <strong>Ver resultados dos alunos</strong>
+            <span>Acompanhe notas, tentativas e evolução nos simulados.</span>
+          </span>
+          <ChevronRight className="admin-shortcut-arrow" />
+        </Link>
+
+        <Link className="admin-shortcut users" to="/admin/usuarios">
+          <span className="admin-shortcut-icon"><UsersRound /></span>
+          <span className="admin-shortcut-copy">
+            <small>Cadastros</small>
+            <strong>Gerenciar usuários</strong>
+            <span>Crie alunos, altere perfis e consulte informações.</span>
+          </span>
+          <ChevronRight className="admin-shortcut-arrow" />
+        </Link>
       </div>
 
       <div className="admin-grid">
@@ -205,5 +224,4 @@ export default function Admin() {
     </section>
   );
 }
-
 

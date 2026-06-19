@@ -1,80 +1,144 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle2, ShieldCheck, Trophy } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpenCheck,
+  CheckCircle2,
+  MapPin,
+  MessageCircle,
+  ShieldCheck,
+  Trophy,
+} from "lucide-react";
+import { siteConfig } from "../config/site";
+
+const categories = [
+  ["A", "Moto"],
+  ["B", "Carro"],
+  ["C", "Carga"],
+  ["D", "Passageiros"],
+  ["E", "Veículos articulados"],
+];
 
 export default function Home() {
   return (
     <>
       <section className="hero">
         <div className="hero-content">
-          <span className="badge">CNH, estudo e acompanhamento em um só lugar</span>
-          <h1>Auto Escola Strada: preparação profissional do atendimento ao simulado.</h1>
+          <span className="eyebrow">Sua habilitação começa aqui</span>
+          <h1>Aprenda com confiança. Dirija com segurança.</h1>
           <p>
-            Um site moderno para apresentar os serviços da autoescola, captar novos alunos
-            e oferecer uma área exclusiva com simulados teóricos, histórico de desempenho e correção automática.
+            Formação completa para categorias A, B, C, D e E, instrutores experientes
+            e acompanhamento de verdade em cada etapa da sua CNH.
           </p>
           <div className="actions">
-            <Link className="btn primary" to="/login">Acessar área do aluno <ArrowRight size={18} /></Link>
-            <Link className="btn secondary" to="/servicos">Conhecer serviços</Link>
+            <a className="btn primary" href={`https://wa.me/${siteConfig.whatsapp}`} target="_blank" rel="noreferrer">
+              Quero tirar minha CNH <MessageCircle size={18} />
+            </a>
+            <Link className="btn secondary" to="/simulado">Fazer simulado</Link>
+          </div>
+          <div className="hero-trust">
+            <span><ShieldCheck size={19} /> Atendimento próximo</span>
+            <span><Trophy size={19} /> Formação completa</span>
           </div>
         </div>
 
-        <div className="hero-panel">
-          <div className="panel-header">
-            <span>Simulado teórico</span>
-            <strong>Online</strong>
-          </div>
-          <h2>Treinamento com perguntas aleatórias e resultado automático.</h2>
-          <div className="mini-list">
-            <span><CheckCircle2 size={18} /> Login real para alunos</span>
-            <span><CheckCircle2 size={18} /> Histórico de tentativas</span>
-            <span><CheckCircle2 size={18} /> Painel administrativo</span>
+        <div className="hero-media">
+          <img
+            src="/images/caminhao-auto-escola-strada.jpg"
+            alt="Caminhão de treinamento da Auto Escola Strada"
+            width="1280"
+            height="960"
+            fetchPriority="high"
+          />
+          <div className="hero-logo-card">
+            <img src="/images/logo-auto-escola-strada.jpg" alt="Auto Escola Strada" width="92" height="92" />
+            <span><strong>Categorias A a E</strong>Uma escola para todas as suas conquistas.</span>
           </div>
         </div>
       </section>
 
-      <section className="section">
+      <section className="category-strip" aria-label="Categorias oferecidas">
+        {categories.map(([letter, label]) => (
+          <div className="category-item" key={letter}>
+            <strong>{letter}</strong>
+            <span>{label}</span>
+          </div>
+        ))}
+      </section>
+
+      <section className="section intro-section">
         <div className="section-title">
-          <span>Estrutura profissional</span>
-          <h2>O site trabalha como vitrine e ferramenta de estudo.</h2>
+          <span className="eyebrow">Auto Escola Strada</span>
+          <h2>Estrutura, experiência e cuidado para você chegar preparado.</h2>
+          <p>Da teoria à prática, nossa equipe acompanha seu desenvolvimento com atenção e respeito ao seu ritmo.</p>
         </div>
-
-        <div className="grid three">
-          <article className="card icon-card">
+        <div className="feature-grid">
+          <article className="feature-card">
+            <BookOpenCheck />
+            <h3>Ensino que prepara</h3>
+            <p>Aulas teóricas, simulados online e orientação para você avançar com segurança.</p>
+          </article>
+          <article className="feature-card featured">
             <ShieldCheck />
-            <h3>Confiança para vender</h3>
-            <p>Serviços bem explicados, diferenciais, etapas da CNH, contato e localização.</p>
+            <h3>Instrutores experientes</h3>
+            <p>Profissionais preparados para ensinar com paciência, clareza e responsabilidade.</p>
           </article>
-          <article className="card icon-card">
+          <article className="feature-card">
             <Trophy />
-            <h3>Área do aluno</h3>
-            <p>O aluno entra com e-mail e senha para fazer simulados e ver resultados.</p>
-          </article>
-          <article className="card icon-card">
-            <CheckCircle2 />
-            <h3>Admin completo</h3>
-            <p>A autoescola pode cadastrar perguntas, editar conteúdo e acompanhar desempenho.</p>
+            <h3>Da categoria A à E</h3>
+            <p>Formação para motos, carros e veículos profissionais em um só lugar.</p>
           </article>
         </div>
       </section>
 
-      <section className="split-section">
-        <div>
-          <span className="badge">Diferencial comercial</span>
-          <h2>Uma página específica para quem tem medo de dirigir.</h2>
+      <section className="moto-feature">
+        <div className="moto-content">
+          <span className="eyebrow light">Diferencial exclusivo</span>
+          <h2>Treine, tire e faça a prova na nossa pista própria.</h2>
           <p>
-            Essa seção aumenta a chance de conversão porque conversa com um público que já tem CNH,
-            mas precisa de confiança, paciência e aulas personalizadas para voltar a dirigir.
+            Na categoria A, você aprende e realiza o exame no mesmo local. Mais familiaridade,
+            praticidade e confiança para conquistar sua CNH de moto.
           </p>
+          <div className="check-list">
+            <span><CheckCircle2 /> Pista exclusiva e preparada</span>
+            <span><CheckCircle2 /> Instrutores experientes</span>
+            <span><CheckCircle2 /> Exame realizado na própria pista</span>
+          </div>
+          <a className="btn light" href={`https://wa.me/${siteConfig.whatsapp}`} target="_blank" rel="noreferrer">
+            Quero minha CNH de moto <ArrowRight size={18} />
+          </a>
         </div>
-        <div className="stats-card">
-          <strong>3</strong>
-          <span>modos de simulado</span>
-          <strong>70%</strong>
-          <span>nota mínima sugerida para aprovação interna</span>
+        <div className="moto-visual" aria-hidden="true">
+          <img src="/images/campanha-cnh-moto.jpg" alt="" width="960" height="960" loading="lazy" />
         </div>
+      </section>
+
+      <section className="section classroom-section">
+        <div className="image-frame">
+          <img
+            src="/images/turma-auto-escola-strada.jpg"
+            alt="Turma em aula teórica na Auto Escola Strada"
+            width="1280"
+            height="963"
+            loading="lazy"
+          />
+          <span>Aprendizado próximo e acolhedor</span>
+        </div>
+        <div className="classroom-copy">
+          <span className="eyebrow">Preparação completa</span>
+          <h2>Do primeiro passo até a aprovação.</h2>
+          <p>Conte com suporte para entender o processo, estudar para a prova e desenvolver segurança nas aulas práticas.</p>
+          <Link className="text-link" to="/como-funciona">Veja como funciona <ArrowRight size={18} /></Link>
+        </div>
+      </section>
+
+      <section className="location-cta">
+        <div>
+          <MapPin size={30} />
+          <span>Venha conhecer a Strada</span>
+          <strong>{siteConfig.address}</strong>
+        </div>
+        <a className="btn dark" href={siteConfig.mapsUrl} target="_blank" rel="noreferrer">Como chegar</a>
       </section>
     </>
   );
 }
-
-

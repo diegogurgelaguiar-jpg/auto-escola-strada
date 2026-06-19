@@ -5,18 +5,33 @@ import { useAuth } from "../state/AuthContext";
 export default function Results() {
   const { session } = useAuth();
   const [attempts, setAttempts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     async function load() {
-      if (!hasSupabaseConfig || !session?.user?.id) return;
+      if (!hasSupabaseConfig || !session?.user?.id) {
+        setLoading(false);
+        return;
+      }
 
-      const { data } = await supabase
+      setLoading(true);
+      setMessage("");
+
+      const { data, error } = await supabase
         .from("quiz_attempts")
         .select("*")
         .eq("user_id", session.user.id)
         .order("created_at", { ascending: false });
 
+      if (error) {
+        setMessage(`Não foi possível carregar seu histórico: ${error.message}`);
+        setLoading(false);
+        return;
+      }
+
       setAttempts(data || []);
+      setLoading(false);
     }
 
     load();
@@ -30,9 +45,12 @@ export default function Results() {
       </div>
 
       {!hasSupabaseConfig && <div className="notice">Configure o Supabase para salvar o histórico real.</div>}
+      {message && <div className="message">{message}</div>}
 
       <div className="table-card">
-        {attempts.length === 0 ? (
+        {loading ? (
+          <p className="data-status">Carregando seu histórico...</p>
+        ) : attempts.length === 0 ? (
           <p>Nenhum resultado encontrado.</p>
         ) : (
           <table>

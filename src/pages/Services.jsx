@@ -1,29 +1,31 @@
+import { Bike, BusFront, CarFront, GraduationCap, RefreshCcw, Truck } from "lucide-react";
+
 const services = [
-  ["Primeira habilitação", "Atendimento para alunos que vão iniciar o processo da CNH."],
-  ["Categoria A", "Preparação para motocicleta com orientação prática e segura."],
-  ["Categoria B", "Treinamento para automóvel com foco em controle, segurança e aprovação."],
-  ["Categoria AB", "Opção completa para quem deseja moto e carro."],
-  ["Adição de categoria", "Para condutores que já possuem CNH e querem ampliar sua habilitação."],
-  ["Aulas para habilitados", "Aulas com paciência para quem tem medo, insegurança ou pouca prática."],
-  ["Reciclagem", "Orientação para condutores que precisam regularizar sua situação."],
-  ["Simulado teórico", "Área exclusiva para alunos treinarem antes da prova teórica."]
+  [Bike, "Categoria A", "Formação para motocicleta com pista própria. Você treina e realiza o exame no mesmo local."],
+  [CarFront, "Categoria B", "Aulas práticas para automóvel com foco em controle, trânsito seguro e confiança ao volante."],
+  [Truck, "Categoria C", "Preparação para condução de veículos de carga com orientação profissional."],
+  [BusFront, "Categoria D", "Formação para conduzir veículos de passageiros com responsabilidade e segurança."],
+  [Truck, "Categoria E", "Treinamento para veículos articulados e combinações de maior porte."],
+  [GraduationCap, "Primeira habilitação", "Acompanhamento em todas as etapas para quem vai conquistar a primeira CNH."],
+  [RefreshCcw, "Adição e mudança", "Amplie sua habilitação com suporte para adicionar ou mudar de categoria."],
+  [CarFront, "Aulas para habilitados", "Recupere a confiança e volte a dirigir com aulas personalizadas no seu ritmo."],
 ];
 
 export default function Services() {
   return (
     <section className="page">
-      <div className="section-title">
-        <span>Serviços</span>
-        <h1>Serviços organizados para gerar mais contatos qualificados.</h1>
-        <p>
-          Cada serviço tem uma explicação objetiva para o visitante entender rapidamente
-          se a autoescola atende o que ele precisa.
-        </p>
+      <div className="page-hero compact-hero">
+        <div>
+          <span className="eyebrow">Nossos serviços</span>
+          <h1>Formação para cada caminho.</h1>
+          <p>Da primeira habilitação às categorias profissionais, a Strada prepara você para dirigir com segurança.</p>
+        </div>
+        <img src="/images/caminhao-auto-escola-strada.jpg" alt="Veículo de treinamento para categorias profissionais" />
       </div>
-
-      <div className="grid four">
-        {services.map(([title, text]) => (
-          <article className="card" key={title}>
+      <div className="service-grid">
+        {services.map(([Icon, title, text]) => (
+          <article className="service-card" key={title}>
+            <span className="service-icon"><Icon /></span>
             <h3>{title}</h3>
             <p>{text}</p>
           </article>
@@ -32,5 +34,3 @@ export default function Services() {
     </section>
   );
 }
-
-

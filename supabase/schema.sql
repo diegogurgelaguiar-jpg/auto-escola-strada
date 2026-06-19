@@ -79,9 +79,25 @@ create trigger on_auth_user_created
 after insert on auth.users
 for each row execute function public.handle_new_user();
 
+insert into public.profiles (id, full_name, email, role)
+select
+  users.id,
+  coalesce(users.raw_user_meta_data->>'full_name', ''),
+  users.email,
+  'student'
+from auth.users as users
+on conflict (id) do update
+set
+  email = excluded.email,
+  full_name = case
+    when coalesce(public.profiles.full_name, '') = '' then excluded.full_name
+    else public.profiles.full_name
+  end;
+
 create or replace function public.is_admin()
 returns boolean
 language sql
+stable
 security definer
 set search_path = public
 as $$
@@ -106,6 +122,12 @@ create policy "profiles_update_own"
 on public.profiles for update to authenticated
 using (id = auth.uid())
 with check (id = auth.uid());
+
+drop policy if exists "profiles_update_admin" on public.profiles;
+create policy "profiles_update_admin"
+on public.profiles for update to authenticated
+using (public.is_admin())
+with check (public.is_admin());
 
 drop policy if exists "questions_select_active" on public.questions;
 create policy "questions_select_active"

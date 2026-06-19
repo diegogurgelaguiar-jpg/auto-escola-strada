@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" role="img" aria-labelledby="title">
+  <title id="title">Exemplo de placa de indicação</title>
+  <rect width="320" height="320" rx="34" fill="#f5f3f1"/>
+  <rect x="42" y="78" width="236" height="164" rx="12" fill="#1766a5" stroke="#fff" stroke-width="10"/>
+  <path d="M82 149h104v-34l62 48-62 48v-34H82z" fill="#fff"/>
+</svg>

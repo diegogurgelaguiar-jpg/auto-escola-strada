@@ -2,7 +2,8 @@ import { useMemo, useState } from "react";
 import { questionCategories } from "../config/site";
 import { demoQuestions } from "../data/demoQuestions";
 import { hasSupabaseConfig, supabase } from "../lib/supabase";
-import { calculateScore, getQuizSize, shuffle } from "../lib/quiz";
+import { calculateScore, getQuizSize, getUniqueQuestions, shuffle } from "../lib/quiz";
+import { getQuestionImage } from "../lib/questionImages";
 import { useAuth } from "../state/AuthContext";
 
 export default function Simulado() {
@@ -15,6 +16,9 @@ export default function Simulado() {
   const [answers, setAnswers] = useState({});
   const [finished, setFinished] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState("");
+  const [quizMessage, setQuizMessage] = useState("");
 
   const score = useMemo(
     () => calculateScore(questions, answers),
@@ -22,6 +26,7 @@ export default function Simulado() {
   );
 
   async function startQuiz() {
+    setQuizMessage("");
     let source = demoQuestions;
 
     if (hasSupabaseConfig) {
@@ -36,12 +41,8 @@ export default function Simulado() {
 
       const { data, error } = await query;
 
-      console.log("Modo:", mode);
-      console.log("Perguntas recebidas:", data?.length);
-      console.log("Erro:", error);
-
       if (error) {
-        alert(error.message);
+        setQuizMessage(`Não foi possível carregar as perguntas: ${error.message}`);
         return;
       }
 
@@ -54,20 +55,20 @@ export default function Simulado() {
 
     const size = getQuizSize(mode);
 
-    console.log("Quantidade solicitada:", size);
-    console.log("Quantidade disponível:", source.length);
+    const uniqueSource = getUniqueQuestions(shuffle(source));
+    const quizQuestions = uniqueSource.slice(0, size);
 
-    const quizQuestions = shuffle(source).slice(0, size);
-
-    console.log(
-      "Perguntas do simulado:",
-      quizQuestions.length
-    );
+    if (quizQuestions.length === 0) {
+      setQuizMessage("Nenhuma pergunta diferente foi encontrada para este modo.");
+      return;
+    }
 
     setQuestions(quizQuestions);
     setAnswers({});
     setFinished(false);
     setSaved(false);
+    setSaving(false);
+    setSaveMessage("");
     setStarted(true);
   }
 
@@ -75,10 +76,16 @@ export default function Simulado() {
     setFinished(true);
 
     if (!hasSupabaseConfig || !session?.user?.id || saved) {
+      if (!hasSupabaseConfig) {
+        setSaveMessage("Resultado concluído, mas o histórico online não está configurado.");
+      }
       return;
     }
 
-    await supabase.from("quiz_attempts").insert({
+    setSaving(true);
+    setSaveMessage("");
+
+    const { error } = await supabase.from("quiz_attempts").insert({
       user_id: session.user.id,
       mode,
       category: mode === "categoria" ? category : null,
@@ -89,7 +96,15 @@ export default function Simulado() {
       answers
     });
 
+    setSaving(false);
+
+    if (error) {
+      setSaveMessage(`Não foi possível salvar este resultado: ${error.message}`);
+      return;
+    }
+
     setSaved(true);
+    setSaveMessage("Resultado salvo no seu histórico.");
   }
 
   if (!started) {
@@ -118,7 +133,7 @@ export default function Simulado() {
                 Completo — até 30 perguntas
               </option>
               <option value="categoria">
-                Por categoria — 15 perguntas
+                Por categoria — até 15 perguntas únicas
               </option>
             </select>
           </label>
@@ -145,6 +160,8 @@ export default function Simulado() {
           >
             Iniciar simulado
           </button>
+
+          {quizMessage && <p className="message">{quizMessage}</p>}
         </div>
       </section>
     );
@@ -167,17 +184,19 @@ export default function Simulado() {
             score.passed ? "approved" : "failed"
           }`}
         >
-          <h2>
-            {score.passed
-              ? "Aprovado no treino"
-              : "Continue estudando"}
-          </h2>
-
-          <p>
-            Você acertou {score.correct} de{" "}
-            {questions.length}. Aproveitamento:{" "}
-            {score.percentage}%.
-          </p>
+          <div className="result-summary">
+            <div className="result-percentage">
+              <strong>{score.percentage}</strong><span>%</span>
+            </div>
+            <div>
+              <span className="result-label">Resultado do simulado</span>
+              <h2>{score.passed ? "Aprovado no treino" : "Continue estudando"}</h2>
+              <p>
+                Você acertou <strong>{score.correct} de {questions.length}</strong> questões.
+                Seu aproveitamento foi de <strong>{score.percentage}%</strong>.
+              </p>
+            </div>
+          </div>
 
           <button
             className="btn secondary"
@@ -185,6 +204,12 @@ export default function Simulado() {
           >
             Fazer outro simulado
           </button>
+
+          {(saving || saveMessage) && (
+            <p className={`save-status ${saved ? "success" : saveMessage ? "error" : ""}`}>
+              {saving ? "Salvando resultado..." : saveMessage}
+            </p>
+          )}
         </div>
       )}
 
@@ -193,6 +218,7 @@ export default function Simulado() {
           const selected = answers[question.id];
           const isCorrect =
             selected === question.correct_option;
+          const questionImage = getQuestionImage(question);
 
           return (
             <article
@@ -209,6 +235,17 @@ export default function Simulado() {
               </div>
 
               <h3>{question.question}</h3>
+
+              {questionImage && (
+                <figure className="question-image">
+                  <img
+                    src={questionImage.src}
+                    alt={questionImage.alt}
+                    loading="lazy"
+                  />
+                  <figcaption>Observe a placa para responder.</figcaption>
+                </figure>
+              )}
 
               {["A", "B", "C", "D"].map((option) => (
                 <label

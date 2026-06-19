@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" role="img" aria-labelledby="title">
+  <title id="title">Placa de velocidade máxima de 60 quilômetros por hora</title>
+  <rect width="320" height="320" rx="34" fill="#f5f3f1"/>
+  <circle cx="160" cy="160" r="120" fill="#fff" stroke="#c51620" stroke-width="28"/>
+  <text x="160" y="194" text-anchor="middle" fill="#171719" font-family="Arial, sans-serif" font-size="100" font-weight="700">60</text>
+</svg>

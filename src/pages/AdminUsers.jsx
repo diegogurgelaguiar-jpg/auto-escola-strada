@@ -1,5 +1,6 @@
 ﻿import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { KeyRound, X } from "lucide-react";
 import { hasSupabaseConfig, supabase } from "../lib/supabase";
 import { useAuth } from "../state/AuthContext";
 
@@ -10,13 +11,30 @@ export default function AdminUsers() {
   const [attempts, setAttempts] = useState([]);
   const [search, setSearch] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [passwordUser, setPasswordUser] = useState(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordLoading, setPasswordLoading] = useState(false);
+
+  function getFunctionMessage(error, functionName) {
+    const rawMessage = String(error?.message || "");
+
+    if (/failed to send a request/i.test(rawMessage)) {
+      return `O serviço ${functionName} não está publicado ou está bloqueado pelo CORS no Supabase.`;
+    }
+
+    return rawMessage || `Não foi possível acessar o serviço ${functionName}.`;
+  }
 
   async function loadData() {
     if (!hasSupabaseConfig) {
       setMessage("Configure o Supabase para usar esta página.");
+      setLoading(false);
       return;
     }
 
+    setLoading(true);
     setMessage("");
 
     const usersResponse = await supabase
@@ -25,7 +43,8 @@ export default function AdminUsers() {
       .order("created_at", { ascending: false });
 
     if (usersResponse.error) {
-      setMessage(usersResponse.error.message);
+      setMessage(`Não foi possível carregar os usuários: ${usersResponse.error.message}`);
+      setLoading(false);
       return;
     }
 
@@ -35,13 +54,15 @@ export default function AdminUsers() {
       .order("created_at", { ascending: false });
 
     if (attemptsResponse.error) {
-      setMessage(attemptsResponse.error.message);
+      setMessage(`Os usuários foram carregados, mas os resultados falharam: ${attemptsResponse.error.message}`);
       setUsers(usersResponse.data || []);
+      setLoading(false);
       return;
     }
 
     setUsers(usersResponse.data || []);
     setAttempts(attemptsResponse.data || []);
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -93,6 +114,13 @@ export default function AdminUsers() {
     };
   }
 
+  function getScoreClass(score, totalAttempts) {
+    if (!totalAttempts) return "";
+    if (score >= 70) return "good";
+    if (score >= 50) return "medium";
+    return "bad";
+  }
+
   async function changeRole(userId, nextRole) {
     if (session?.user?.id === userId && nextRole === "student") {
       setMessage("Você não pode remover seu próprio acesso de administrador.");
@@ -120,6 +148,56 @@ export default function AdminUsers() {
     loadData();
   }
 
+  function openPasswordModal(user) {
+    setPasswordUser(user);
+    setNewPassword("");
+    setConfirmPassword("");
+    setMessage("");
+  }
+
+  function closePasswordModal() {
+    if (passwordLoading) return;
+    setPasswordUser(null);
+    setNewPassword("");
+    setConfirmPassword("");
+  }
+
+  async function handlePasswordChange(event) {
+    event.preventDefault();
+    setMessage("");
+
+    if (newPassword.length < 6) {
+      setMessage("A nova senha precisa ter pelo menos 6 caracteres.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setMessage("A confirmação não corresponde à nova senha.");
+      return;
+    }
+
+    setPasswordLoading(true);
+
+    const { data, error } = await supabase.functions.invoke("reset-user-password", {
+      body: { userId: passwordUser.id, password: newPassword },
+    });
+
+    setPasswordLoading(false);
+
+    if (error) {
+      setMessage(`Não foi possível trocar a senha: ${getFunctionMessage(error, "reset-user-password")}`);
+      return;
+    }
+
+    if (data?.error) {
+      setMessage(`Não foi possível trocar a senha: ${data.error}`);
+      return;
+    }
+
+    setMessage(`Senha de ${passwordUser.full_name || passwordUser.email} alterada com sucesso.`);
+    closePasswordModal();
+  }
+
   async function deleteUserProfile(userId, email) {
   if (session?.user?.id === userId) {
     setMessage("Você não pode excluir o próprio perfil enquanto está logado.");
@@ -141,14 +219,12 @@ export default function AdminUsers() {
   });
 
   if (error) {
-    setMessage(error.message);
-    alert(error.message);
+    setMessage(`Não foi possível excluir o usuário: ${getFunctionMessage(error, "delete-user")}`);
     return;
   }
 
   if (data?.error) {
     setMessage(data.error);
-    alert(data.error);
     return;
   }
 
@@ -157,7 +233,7 @@ export default function AdminUsers() {
 }
 
   return (
-    <section className="page">
+    <section className="page admin-users-page">
       <div className="section-title">
         <span>Admin</span>
         <h1>Gerenciar usuários</h1>
@@ -191,11 +267,23 @@ export default function AdminUsers() {
 
       {message && <p className="message">{message}</p>}
 
-      <div className="table-card">
-        {filteredUsers.length === 0 ? (
+      <div className="table-card user-table-card">
+        {loading ? (
+          <p className="data-status">Carregando usuários...</p>
+        ) : filteredUsers.length === 0 ? (
           <p>Nenhum usuário encontrado.</p>
         ) : (
-          <table>
+          <table className="user-table">
+            <colgroup>
+              <col className="col-name" />
+              <col className="col-email" />
+              <col className="col-role" />
+              <col className="col-attempts" />
+              <col className="col-average" />
+              <col className="col-best" />
+              <col className="col-date" />
+              <col className="col-actions" />
+            </colgroup>
             <thead>
               <tr>
                 <th>Nome</th>
@@ -218,17 +306,38 @@ export default function AdminUsers() {
                   <tr key={user.id}>
                     <td>{user.full_name || "-"}</td>
                     <td>{user.email || "-"}</td>
-                    <td>{user.role || "student"}</td>
-                    <td>{stats.totalAttempts}</td>
-                    <td>{stats.average}%</td>
-                    <td>{stats.best}%</td>
+                    <td>
+                      <span className={`role-badge ${user.role === "admin" ? "admin" : "student"}`}>
+                        {user.role === "admin" ? "Administrador" : "Aluno"}
+                      </span>
+                    </td>
+                    <td><span className="attempt-count">{stats.totalAttempts}</span></td>
+                    <td>
+                      <span className={`score-value ${getScoreClass(stats.average, stats.totalAttempts)}`}>
+                        {stats.average}%
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`score-value ${getScoreClass(stats.best, stats.totalAttempts)}`}>
+                        {stats.best}%
+                      </span>
+                    </td>
                     <td>
                       {user.created_at
                         ? new Date(user.created_at).toLocaleDateString("pt-BR")
                         : "-"}
                     </td>
                     <td>
-                      <div className="row-actions">
+                      <div className="row-actions user-actions">
+                        <button
+                          className="btn password small"
+                          type="button"
+                          onClick={() => openPasswordModal(user)}
+                        >
+                          <KeyRound size={15} />
+                          Trocar senha
+                        </button>
+
                         {user.role === "admin" ? (
                           <button
                             className="btn secondary small"
@@ -265,6 +374,50 @@ export default function AdminUsers() {
           </table>
         )}
       </div>
+
+      {passwordUser && (
+        <div className="modal-backdrop" role="presentation" onMouseDown={closePasswordModal}>
+          <div className="password-modal" role="dialog" aria-modal="true" aria-labelledby="password-modal-title" onMouseDown={(event) => event.stopPropagation()}>
+            <button className="modal-close" type="button" onClick={closePasswordModal} aria-label="Fechar">
+              <X />
+            </button>
+            <span className="password-modal-icon"><KeyRound /></span>
+            <h2 id="password-modal-title">Trocar senha do aluno</h2>
+            <p>Defina uma senha temporária para <strong>{passwordUser.full_name || passwordUser.email}</strong>.</p>
+
+            <form className="form" onSubmit={handlePasswordChange}>
+              <label>
+                Nova senha
+                <input
+                  type="password"
+                  minLength="6"
+                  value={newPassword}
+                  onChange={(event) => setNewPassword(event.target.value)}
+                  autoComplete="new-password"
+                  required
+                />
+              </label>
+              <label>
+                Confirmar nova senha
+                <input
+                  type="password"
+                  minLength="6"
+                  value={confirmPassword}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
+                  autoComplete="new-password"
+                  required
+                />
+              </label>
+              <div className="modal-actions">
+                <button className="btn secondary" type="button" onClick={closePasswordModal} disabled={passwordLoading}>Cancelar</button>
+                <button className="btn primary" type="submit" disabled={passwordLoading}>
+                  {passwordLoading ? "Alterando..." : "Salvar nova senha"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

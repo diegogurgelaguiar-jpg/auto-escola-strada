@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
-import { BookOpenCheck, LogOut, Menu, X } from "lucide-react";
+import { LogOut, MapPin, Menu, MessageCircle, Phone, X } from "lucide-react";
 import { useAuth } from "../state/AuthContext";
 import { siteConfig } from "../config/site";
+import Brand from "./Brand";
 
 export default function Layout() {
   const { session, isAdmin } = useAuth();
@@ -25,16 +26,7 @@ export default function Layout() {
   return (
     <>
       <header className="site-header">
-        <Link className="logo" to="/" onClick={() => setOpen(false)}>
-          <span className="logo-mark">
-            <BookOpenCheck size={22} />
-          </span>
-
-          <span>
-            <strong>{siteConfig.name}</strong>
-            <small>{siteConfig.slogan}</small>
-          </span>
-        </Link>
+        <Brand onClick={() => setOpen(false)} />
 
         <button
           type="button"
@@ -94,21 +86,31 @@ export default function Layout() {
         href={`https://wa.me/${siteConfig.whatsapp}`}
         target="_blank"
         rel="noreferrer"
+        aria-label="Falar com a Auto Escola Strada pelo WhatsApp"
       >
-        WhatsApp
+        <MessageCircle size={20} />
+        <span>WhatsApp</span>
       </a>
 
       <footer className="footer">
-        <div>
-          <strong>{siteConfig.name}</strong>
+        <div className="footer-brand">
+          <Brand />
           <p>{siteConfig.description}</p>
         </div>
-
+        <div className="footer-contact">
+          <strong>Fale com a Strada</strong>
+          <a href={`tel:+${siteConfig.whatsapp}`}><Phone size={17} /> {siteConfig.phone}</a>
+          <a href={siteConfig.mapsUrl} target="_blank" rel="noreferrer"><MapPin size={17} /> {siteConfig.address}</a>
+        </div>
         <div className="footer-links">
+          <strong>Atalhos</strong>
+          <Link to="/servicos">Serviços</Link>
+          <Link to="/simulado">Simulado</Link>
           <Link to="/privacidade">Privacidade</Link>
           <Link to="/termos">Termos</Link>
         </div>
       </footer>
+      <div className="footer-bottom">© {new Date().getFullYear()} {siteConfig.name}. Todos os direitos reservados.</div>
     </>
   );
 }
