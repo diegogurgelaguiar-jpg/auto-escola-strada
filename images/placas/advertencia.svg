@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" role="img" aria-labelledby="title">
+  <title id="title">Exemplo de placa de advertência</title>
+  <rect width="320" height="320" rx="34" fill="#f5f3f1"/>
+  <rect x="66" y="66" width="188" height="188" rx="18" fill="#f4c542" stroke="#171719" stroke-width="12" transform="rotate(45 160 160)"/>
+  <rect x="150" y="94" width="20" height="92" rx="10" fill="#171719"/>
+  <circle cx="160" cy="220" r="13" fill="#171719"/>
+</svg>
