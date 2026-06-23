@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
-import { BookOpen, ClipboardCheck, History } from "lucide-react";
+import { BookOpen, ClipboardCheck, History, ShieldCheck } from "lucide-react";
 import { useAuth } from "../state/AuthContext";
 
 export default function StudentDashboard() {
-  const { session, profile } = useAuth();
+  const { session, profile, isAdmin } = useAuth();
   const name = profile?.full_name || session?.user?.email;
 
   return (
@@ -13,6 +13,18 @@ export default function StudentDashboard() {
         <h1>Olá, {name}</h1>
         <p>Escolha um simulado, acompanhe seu resultado e melhore sua preparação para a prova teórica.</p>
       </div>
+
+      {isAdmin && (
+        <article className="admin-access-card">
+          <span className="admin-access-icon"><ShieldCheck /></span>
+          <div>
+            <small>Acesso de administrador</small>
+            <h2>Painel administrativo disponível</h2>
+            <p>Gerencie perguntas, resultados dos alunos, usuários e senhas também pelo celular.</p>
+          </div>
+          <Link className="btn primary" to="/admin">Abrir Admin</Link>
+        </article>
+      )}
 
       <div className="dashboard-grid">
         <article className="card icon-card big-card">
@@ -38,5 +50,3 @@ export default function StudentDashboard() {
     </section>
   );
 }
-
-

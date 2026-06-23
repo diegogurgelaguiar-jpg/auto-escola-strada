@@ -51,7 +51,7 @@ export default function Layout() {
               </NavLink>
 
               {isAdmin && (
-                <NavLink to="/admin" onClick={() => setOpen(false)}>
+                <NavLink className="admin-nav-link" to="/admin" onClick={() => setOpen(false)}>
                   Admin
                 </NavLink>
               )}

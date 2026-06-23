@@ -58,6 +58,7 @@ main { min-height: 70vh; overflow: hidden; }
 .nav a:not(.nav-cta)::after { content: ""; position: absolute; left: 0; right: 0; bottom: -.55rem; height: 2px; background: var(--red); transform: scaleX(0); transition: transform .2s ease; }
 .nav a.active, .nav a:hover, .link-button:hover { color: var(--red); }
 .nav a.active::after, .nav a:hover::after { transform: scaleX(1); }
+.nav .admin-nav-link { color: var(--red); font-weight: 850; }
 
 .nav-cta, .btn {
   border: 0;
@@ -237,6 +238,25 @@ textarea { min-height: 115px; resize: vertical; }
 .muted { color: var(--muted); }
 .center { display: block; margin: 1rem auto 0; text-align: center; }
 
+.admin-access-card {
+  display: grid;
+  grid-template-columns: 58px 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 2rem;
+  padding: 1.25rem;
+  color: var(--ink);
+  background: linear-gradient(135deg, var(--surface-red), white);
+  border: 1px solid rgba(179,8,18,.18);
+  border-left: 5px solid var(--red);
+  border-radius: var(--radius);
+  box-shadow: 0 7px 22px rgba(38, 23, 22, .045);
+}
+.admin-access-icon { display: grid; place-items: center; width: 58px; height: 58px; color: white; background: var(--red); border-radius: 18px; }
+.admin-access-card small { color: var(--red); font-size: .7rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+.admin-access-card h2 { margin: .2rem 0 .35rem; font-size: clamp(1.35rem, 2.2vw, 1.85rem); letter-spacing: -.035em; }
+.admin-access-card p { margin: 0; color: var(--muted); line-height: 1.5; }
+
 .big-card { min-height: 245px; }
 .icon-card svg { color: var(--red); }
 .quiz-settings { display: grid; gap: 1rem; max-width: 700px; margin-top: 2rem; }
@@ -391,6 +411,7 @@ tbody tr:hover { background: var(--surface-soft); }
   .nav.is-open { display: flex; }
   .nav a, .nav button { padding: .75rem; text-align: left; }
   .nav a::after { display: none; }
+  .nav .admin-nav-link { display: flex; justify-content: center; color: white; background: var(--red); border-radius: 12px; text-align: center; }
   .nav-cta { text-align: center !important; }
   .hero { grid-template-columns: 1fr; min-height: auto; padding-top: 4rem; }
   .hero-media { min-height: 420px; }
@@ -435,6 +456,9 @@ tbody tr:hover { background: var(--surface-soft); }
   .timeline-item { grid-template-columns: 52px 1fr; padding: 1.1rem; }
   .admin-shortcut { grid-template-columns: 48px 1fr auto; min-height: 128px; padding: 1rem; }
   .admin-shortcut-icon { width: 48px; height: 48px; border-radius: 15px; }
+  .admin-access-card { grid-template-columns: 48px 1fr; align-items: start; padding: 1rem; }
+  .admin-access-card .btn { grid-column: 1 / -1; width: 100%; }
+  .admin-access-icon { width: 48px; height: 48px; border-radius: 15px; }
   .sticky-actions { border-radius: 20px; flex-direction: column; align-items: stretch; }
   .result-summary { grid-template-columns: 1fr; gap: 1rem; }
   .result-percentage { width: 118px; }
