@@ -1,6 +1,6 @@
 ﻿import React from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import "./styles.css";
 import { AuthProvider } from "./state/AuthContext";
 import Layout from "./components/Layout";
@@ -24,7 +24,7 @@ import NotFound from "./pages/NotFound";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <BrowserRouter basename={import.meta.env.BASE_URL}>
+    <AppRouter>
       <AuthProvider>
         <Routes>
           <Route element={<Layout />}>
@@ -105,6 +105,13 @@ createRoot(document.getElementById("root")).render(
           </Route>
         </Routes>
       </AuthProvider>
-    </BrowserRouter>
+    </AppRouter>
   </React.StrictMode>
 );
+
+function AppRouter({ children }) {
+  const Router = import.meta.env.BASE_URL === "/" ? BrowserRouter : HashRouter;
+  const basename = import.meta.env.BASE_URL === "/" ? undefined : import.meta.env.BASE_URL;
+
+  return <Router basename={basename}>{children}</Router>;
+}
