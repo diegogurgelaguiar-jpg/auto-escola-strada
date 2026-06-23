@@ -18,6 +18,30 @@ const categories = [
   ["E", "Veículos articulados"],
 ];
 
+const fleetVehicles = [
+  {
+    src: "/images/frota-carro-vermelho-strada.jpg",
+    alt: "Carro vermelho da Auto Escola Strada para aulas práticas",
+    label: "Categoria B",
+    title: "Carros conservados e revisados",
+    text: "Veículos identificados, com manutenção em dia e preparados para você treinar com mais tranquilidade no volante.",
+  },
+  {
+    src: "/images/frota-carro-prata-pista-strada.jpg",
+    alt: "Carro prata da Auto Escola Strada próximo à pista de treinamento",
+    label: "Aulas práticas",
+    title: "Estrutura real para aprender melhor",
+    text: "Aulas com veículos da própria escola e acompanhamento próximo para desenvolver controle, atenção e segurança no trânsito.",
+  },
+  {
+    src: "/images/frota-motos-pista-strada.jpg",
+    alt: "Motos da Auto Escola Strada usadas nas aulas de categoria A",
+    label: "Categoria A",
+    title: "Motos bem cuidadas na pista própria",
+    text: "Motos em ótimo estado para treinar na pista da Strada, no mesmo ambiente onde o aluno realiza o exame de moto.",
+  },
+];
+
 export default function Home() {
   return (
     <>
@@ -87,6 +111,35 @@ export default function Home() {
             <h3>Da categoria A à E</h3>
             <p>Formação para motos, carros e veículos profissionais em um só lugar.</p>
           </article>
+        </div>
+      </section>
+
+      <section className="section fleet-section">
+        <div className="section-title centered">
+          <span className="eyebrow">Nossa frota</span>
+          <h2>Veículos preparados para você aprender com confiança.</h2>
+          <p>
+            Carros e motos da Auto Escola Strada são conservados, revisados e cuidados
+            para que cada aula prática seja mais segura, confortável e produtiva.
+          </p>
+        </div>
+
+        <div className="fleet-grid">
+          {fleetVehicles.map((vehicle) => (
+            <article className="fleet-card" key={vehicle.title}>
+              <img src={vehicle.src} alt={vehicle.alt} width="1400" height="1050" loading="lazy" />
+              <div className="fleet-card-copy">
+                <span>{vehicle.label}</span>
+                <h3>{vehicle.title}</h3>
+                <p>{vehicle.text}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <div className="fleet-note">
+          <CheckCircle2 size={22} />
+          <strong>Manutenção em dia, identificação da escola e suporte de instrutores experientes em cada etapa.</strong>
         </div>
       </section>
 

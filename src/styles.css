@@ -157,6 +157,22 @@ main { min-height: 70vh; overflow: hidden; }
 .feature-card p, .service-card p, .card p, .auth-card p, .cta-box p { color: var(--muted); line-height: 1.65; }
 .service-icon { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 16px; background: var(--surface-red); }
 
+.fleet-section { background: linear-gradient(180deg, white, var(--surface-soft)); }
+.fleet-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.15rem; margin-top: 2.5rem; }
+.fleet-card { position: relative; min-height: 430px; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--ink); box-shadow: 0 7px 22px rgba(38, 23, 22, .055); }
+.fleet-card img { width: 100%; height: 100%; min-height: 430px; object-fit: cover; filter: contrast(1.04) saturate(1.07); transition: transform .35s ease; }
+.fleet-card:nth-child(1) img { object-position: 52% 45%; }
+.fleet-card:nth-child(2) img { object-position: center; }
+.fleet-card:nth-child(3) img { object-position: 48% 50%; }
+.fleet-card::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 34%, rgba(0,0,0,.78) 100%); }
+.fleet-card:hover img { transform: scale(1.035); }
+.fleet-card-copy { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; display: grid; gap: .45rem; padding: 1.35rem; color: white; }
+.fleet-card-copy span { width: max-content; padding: .38rem .62rem; color: white; background: var(--red); border-radius: 999px; font-size: .7rem; font-weight: 850; text-transform: uppercase; letter-spacing: .08em; }
+.fleet-card-copy h3 { margin: 0; font-size: clamp(1.35rem, 2vw, 1.75rem); line-height: 1.05; letter-spacing: -.035em; }
+.fleet-card-copy p { margin: 0; color: rgba(255,255,255,.82); line-height: 1.55; }
+.fleet-note { display: flex; align-items: center; justify-content: center; gap: .7rem; max-width: 920px; margin: 1.35rem auto 0; padding: 1rem 1.2rem; color: var(--red); background: white; border: 1px solid rgba(179,8,18,.16); border-radius: 999px; box-shadow: 0 7px 22px rgba(38, 23, 22, .045); text-align: center; }
+.fleet-note svg { flex: 0 0 auto; }
+
 .moto-feature { display: grid; grid-template-columns: 1fr 1fr; min-height: 660px; background: linear-gradient(135deg, var(--red-bright), var(--red-dark)); color: white; }
 .moto-content { display: flex; flex-direction: column; justify-content: center; padding: clamp(4rem, 8vw, 7rem) 5vw; }
 .moto-content h2 { max-width: 730px; font-size: clamp(2.4rem, 4.7vw, 4.8rem); }
@@ -359,6 +375,8 @@ tbody tr:hover { background: var(--surface-soft); }
   .brand small { display: none; }
   .hero { grid-template-columns: 1fr 1fr; }
   .hero-logo-card { left: -1rem; }
+  .fleet-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .fleet-card:first-child { grid-column: 1 / -1; }
   .service-grid, .grid.four { grid-template-columns: repeat(2, minmax(0,1fr)); }
   .footer { grid-template-columns: 1.2fr 1fr; }
   .footer-links { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; }
@@ -381,6 +399,8 @@ tbody tr:hover { background: var(--surface-soft); }
   .category-strip { grid-template-columns: repeat(5, minmax(120px,1fr)); overflow-x: auto; }
   .feature-grid, .grid.three, .dashboard-grid { grid-template-columns: 1fr; }
   .feature-card.featured { transform: none; }
+  .fleet-grid { grid-template-columns: 1fr; }
+  .fleet-card:first-child { grid-column: auto; }
   .moto-feature, .classroom-section, .page-hero, .contact-grid, .admin-grid { grid-template-columns: 1fr; }
   .admin-shortcuts { grid-template-columns: 1fr; }
   .moto-visual { min-height: 0; }
@@ -406,6 +426,8 @@ tbody tr:hover { background: var(--surface-soft); }
   .hero-trust { display: grid; gap: .7rem; }
   .category-strip { padding-inline: 2vw; }
   .service-grid, .grid.four { grid-template-columns: 1fr; }
+  .fleet-card, .fleet-card img { min-height: 360px; }
+  .fleet-note { border-radius: var(--radius); align-items: flex-start; text-align: left; }
   .moto-content { padding-inline: 5vw; }
   .moto-visual { min-height: 0; }
   .location-cta { flex-direction: column; align-items: stretch; }
