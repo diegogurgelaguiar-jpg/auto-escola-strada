@@ -110,8 +110,9 @@ createRoot(document.getElementById("root")).render(
 );
 
 function AppRouter({ children }) {
-  const Router = import.meta.env.BASE_URL === "/" ? BrowserRouter : HashRouter;
-  const basename = import.meta.env.BASE_URL === "/" ? undefined : import.meta.env.BASE_URL;
+  if (import.meta.env.BASE_URL === "/") {
+    return <BrowserRouter>{children}</BrowserRouter>;
+  }
 
-  return <Router basename={basename}>{children}</Router>;
+  return <HashRouter>{children}</HashRouter>;
 }
