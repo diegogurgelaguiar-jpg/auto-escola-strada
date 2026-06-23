@@ -9,6 +9,7 @@ import {
   Trophy,
 } from "lucide-react";
 import { siteConfig } from "../config/site";
+import { assetPath } from "../lib/assets";
 
 const categories = [
   ["A", "Moto"],
@@ -20,21 +21,21 @@ const categories = [
 
 const fleetVehicles = [
   {
-    src: "/images/frota-carro-vermelho-strada.jpg",
+    src: assetPath("/images/frota-carro-vermelho-strada.jpg"),
     alt: "Carro vermelho da Auto Escola Strada para aulas práticas",
     label: "Categoria B",
     title: "Carros conservados e revisados",
     text: "Veículos identificados, com manutenção em dia e preparados para você treinar com mais tranquilidade no volante.",
   },
   {
-    src: "/images/frota-carro-prata-pista-strada.jpg",
+    src: assetPath("/images/frota-carro-prata-pista-strada.jpg"),
     alt: "Carro prata da Auto Escola Strada próximo à pista de treinamento",
     label: "Aulas práticas",
     title: "Estrutura real para aprender melhor",
     text: "Aulas com veículos da própria escola e acompanhamento próximo para desenvolver controle, atenção e segurança no trânsito.",
   },
   {
-    src: "/images/frota-motos-pista-strada.jpg",
+    src: assetPath("/images/frota-motos-pista-strada.jpg"),
     alt: "Motos da Auto Escola Strada usadas nas aulas de categoria A",
     label: "Categoria A",
     title: "Motos bem cuidadas na pista própria",
@@ -67,14 +68,14 @@ export default function Home() {
 
         <div className="hero-media">
           <img
-            src="/images/caminhao-auto-escola-strada.jpg"
+            src={assetPath("/images/caminhao-auto-escola-strada.jpg")}
             alt="Caminhão de treinamento da Auto Escola Strada"
             width="1280"
             height="960"
             fetchPriority="high"
           />
           <div className="hero-logo-card">
-            <img src="/images/logo-auto-escola-strada.jpg" alt="Auto Escola Strada" width="92" height="92" />
+            <img src={assetPath("/images/logo-auto-escola-strada.jpg")} alt="Auto Escola Strada" width="92" height="92" />
             <span><strong>Categorias A a E</strong>Uma escola para todas as suas conquistas.</span>
           </div>
         </div>
@@ -161,14 +162,14 @@ export default function Home() {
           </a>
         </div>
         <div className="moto-visual" aria-hidden="true">
-          <img src="/images/campanha-cnh-moto.jpg" alt="" width="960" height="960" loading="lazy" />
+          <img src={assetPath("/images/campanha-cnh-moto.jpg")} alt="" width="960" height="960" loading="lazy" />
         </div>
       </section>
 
       <section className="section classroom-section">
         <div className="image-frame">
           <img
-            src="/images/turma-auto-escola-strada.jpg"
+            src={assetPath("/images/turma-auto-escola-strada.jpg")}
             alt="Turma em aula teórica na Auto Escola Strada"
             width="1280"
             height="963"

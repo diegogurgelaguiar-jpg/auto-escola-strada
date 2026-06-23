@@ -1,5 +1,6 @@
 import { Clock3, MapPin, MessageCircle, Phone } from "lucide-react";
 import { siteConfig } from "../config/site";
+import { assetPath } from "../lib/assets";
 
 export default function Contact() {
   return (
@@ -16,7 +17,13 @@ export default function Contact() {
           <a href={siteConfig.mapsUrl} target="_blank" rel="noreferrer"><MapPin /><span><small>Endereço</small><strong>{siteConfig.address}</strong></span></a>
           <div><Clock3 /><span><small>Atendimento</small><strong>{siteConfig.hours}</strong></span></div>
         </div>
-        <a className="map-card" href={siteConfig.mapsUrl} target="_blank" rel="noreferrer">
+        <a
+          className="map-card"
+          href={siteConfig.mapsUrl}
+          target="_blank"
+          rel="noreferrer"
+          style={{ "--map-card-image": `url("${assetPath("/images/caminhao-auto-escola-strada.jpg")}")` }}
+        >
           <MapPin size={44} />
           <strong>Auto Escola Strada</strong>
           <span>Venda Nova · Belo Horizonte</span>

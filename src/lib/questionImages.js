@@ -1,22 +1,24 @@
+import { assetPath } from "./assets";
+
 const signImages = {
   pare: {
-    src: "/images/placas/pare.svg",
+    src: assetPath("/images/placas/pare.svg"),
     alt: "Placa de parada obrigatória PARE",
   },
   velocidade: {
-    src: "/images/placas/velocidade-maxima.svg",
+    src: assetPath("/images/placas/velocidade-maxima.svg"),
     alt: "Exemplo de placa de velocidade máxima",
   },
   advertencia: {
-    src: "/images/placas/advertencia.svg",
+    src: assetPath("/images/placas/advertencia.svg"),
     alt: "Exemplo de placa de advertência",
   },
   indicacao: {
-    src: "/images/placas/indicacao.svg",
+    src: assetPath("/images/placas/indicacao.svg"),
     alt: "Exemplo de placa de indicação",
   },
   regulamentacao: {
-    src: "/images/placas/regulamentacao.svg",
+    src: assetPath("/images/placas/regulamentacao.svg"),
     alt: "Exemplos de placas de regulamentação",
   },
 };

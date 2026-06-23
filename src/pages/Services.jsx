@@ -1,4 +1,5 @@
 import { Bike, BusFront, CarFront, GraduationCap, RefreshCcw, Truck } from "lucide-react";
+import { assetPath } from "../lib/assets";
 
 const services = [
   [Bike, "Categoria A", "Formação para motocicleta com pista própria. Você treina e realiza o exame no mesmo local."],
@@ -20,7 +21,7 @@ export default function Services() {
           <h1>Formação para cada caminho.</h1>
           <p>Da primeira habilitação às categorias profissionais, a Strada prepara você para dirigir com segurança.</p>
         </div>
-        <img src="/images/caminhao-auto-escola-strada.jpg" alt="Veículo de treinamento para categorias profissionais" />
+        <img src={assetPath("/images/caminhao-auto-escola-strada.jpg")} alt="Veículo de treinamento para categorias profissionais" />
       </div>
       <div className="service-grid">
         {services.map(([Icon, title, text]) => (
