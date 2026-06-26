@@ -1,21 +1,13 @@
 import { useMemo, useState } from "react";
 import { questionCategories } from "../config/site";
 import { demoQuestions } from "../data/demoQuestions";
-import { hasSupabaseConfig, supabase } from "../lib/supabase";
+import { hasSupabaseConfig } from "../lib/supabase";
+import { insertRow, selectRows } from "../lib/supabaseRest";
 import { calculateScore, getQuizSize, getUniqueQuestions, shuffle } from "../lib/quiz";
 import { getQuestionImage } from "../lib/questionImages";
 import { useAuth } from "../state/AuthContext";
 
 const QUIZ_LOAD_TIMEOUT_MS = 12000;
-
-function withTimeout(promise, timeoutMs) {
-  return Promise.race([
-    promise,
-    new Promise((resolve) => {
-      window.setTimeout(() => resolve({ data: null, error: null, timedOut: true }), timeoutMs);
-    })
-  ]);
-}
 
 export default function Simulado() {
   const { session } = useAuth();
@@ -47,21 +39,18 @@ export default function Simulado() {
       let source = demoQuestions;
 
       if (hasSupabaseConfig) {
-        let query = supabase
-          .from("questions")
-          .select("*")
-          .eq("is_active", true);
+        const filters = { is_active: "eq.true" };
 
         if (mode === "categoria") {
-          query = query.eq("category", category);
+          filters.category = `eq.${category}`;
         }
 
-        const { data, error, timedOut } = await withTimeout(query, QUIZ_LOAD_TIMEOUT_MS);
-
-        if (timedOut) {
-          setQuizMessage("A busca das perguntas demorou demais. Verifique a conexão e tente novamente.");
-          return;
-        }
+        const { data, error } = await selectRows(
+          "questions",
+          { filters },
+          session?.access_token,
+          QUIZ_LOAD_TIMEOUT_MS
+        );
 
         if (error) {
           setQuizMessage(`Nao foi possivel carregar as perguntas do banco: ${error.message}`);
@@ -110,16 +99,21 @@ export default function Simulado() {
     setSaving(true);
     setSaveMessage("");
 
-    const { error } = await supabase.from("quiz_attempts").insert({
-      user_id: session.user.id,
-      mode,
-      category: mode === "categoria" ? category : null,
-      total_questions: questions.length,
-      correct_answers: score.correct,
-      percentage: score.percentage,
-      passed: score.passed,
-      answers
-    });
+    const { error } = await insertRow(
+      "quiz_attempts",
+      {
+        user_id: session.user.id,
+        mode,
+        category: mode === "categoria" ? category : null,
+        total_questions: questions.length,
+        correct_answers: score.correct,
+        percentage: score.percentage,
+        passed: score.passed,
+        answers
+      },
+      session.access_token,
+      12000
+    );
 
     setSaving(false);
 

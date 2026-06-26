@@ -1,5 +1,6 @@
-﻿import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { hasSupabaseConfig, supabase } from "../lib/supabase";
+import { selectRows } from "../lib/supabaseRest";
 
 const AuthContext = createContext(null);
 
@@ -8,18 +9,22 @@ export function AuthProvider({ children }) {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  async function loadProfile(userId) {
+  async function loadProfile(userId, accessToken) {
     if (!supabase || !userId) {
       setProfile(null);
       return null;
     }
 
     try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", userId)
-        .maybeSingle();
+      const { data, error } = await selectRows(
+        "profiles",
+        {
+          filters: { id: `eq.${userId}` },
+          limit: 1,
+        },
+        accessToken,
+        12000
+      );
 
       if (error) {
         console.error("Erro ao carregar perfil:", error);
@@ -27,8 +32,9 @@ export function AuthProvider({ children }) {
         return null;
       }
 
-      setProfile(data || null);
-      return data || null;
+      const nextProfile = data?.[0] || null;
+      setProfile(nextProfile);
+      return nextProfile;
     } catch (error) {
       console.error("Erro inesperado ao carregar perfil:", error);
       setProfile(null);
@@ -59,7 +65,7 @@ export function AuthProvider({ children }) {
         setSession(currentSession);
 
         if (currentSession?.user?.id) {
-          await loadProfile(currentSession.user.id);
+          await loadProfile(currentSession.user.id, currentSession.access_token);
         } else {
           setProfile(null);
         }
@@ -84,14 +90,17 @@ export function AuthProvider({ children }) {
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, nextSession) => {
         setSession(nextSession || null);
-        setLoading(false);
 
         if (nextSession?.user?.id) {
+          setLoading(true);
           window.setTimeout(() => {
-            loadProfile(nextSession.user.id);
+            loadProfile(nextSession.user.id, nextSession.access_token).finally(() => {
+              setLoading(false);
+            });
           }, 0);
         } else {
           setProfile(null);
+          setLoading(false);
         }
       }
     );

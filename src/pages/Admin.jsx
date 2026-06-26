@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { BarChart3, ChevronRight, UsersRound } from "lucide-react";
 import { questionCategories } from "../config/site";
 import { hasSupabaseConfig, supabase } from "../lib/supabase";
+import { selectRows } from "../lib/supabaseRest";
 import { useAuth } from "../state/AuthContext";
 
 const emptyQuestion = {
@@ -28,17 +29,24 @@ export default function Admin() {
   async function loadQuestions() {
     if (!hasSupabaseConfig) return;
 
-    const { data } = await supabase
-      .from("questions")
-      .select("*")
-      .order("created_at", { ascending: false });
+    const { data, error } = await selectRows(
+      "questions",
+      { order: "created_at.desc" },
+      session?.access_token,
+      12000
+    );
+
+    if (error) {
+      setMessage(`Nao foi possivel carregar as perguntas: ${error.message}`);
+      return;
+    }
 
     setQuestions(data || []);
   }
 
   useEffect(() => {
     loadQuestions();
-  }, []);
+  }, [session]);
 
   function editQuestion(question) {
     setEditingId(question.id);
@@ -224,4 +232,3 @@ export default function Admin() {
     </section>
   );
 }
-

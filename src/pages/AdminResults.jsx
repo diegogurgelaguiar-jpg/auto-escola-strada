@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { hasSupabaseConfig, supabase } from "../lib/supabase";
+import { hasSupabaseConfig } from "../lib/supabase";
+import { selectRows } from "../lib/supabaseRest";
+import { useAuth } from "../state/AuthContext";
 
 export default function AdminResults() {
+  const { session } = useAuth();
   const [attempts, setAttempts] = useState([]);
   const [profiles, setProfiles] = useState([]);
   const [search, setSearch] = useState("");
@@ -18,11 +21,15 @@ export default function AdminResults() {
     setLoading(true);
     setMessage("");
 
-    const attemptsResponse = await supabase
-      .from("quiz_attempts")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(200);
+    const attemptsResponse = await selectRows(
+      "quiz_attempts",
+      {
+        order: "created_at.desc",
+        limit: 200,
+      },
+      session?.access_token,
+      12000
+    );
 
     if (attemptsResponse.error) {
       setMessage(`Não foi possível carregar os resultados: ${attemptsResponse.error.message}`);
@@ -30,9 +37,12 @@ export default function AdminResults() {
       return;
     }
 
-    const profilesResponse = await supabase
-      .from("profiles")
-      .select("id, full_name, email");
+    const profilesResponse = await selectRows(
+      "profiles",
+      { select: "id,full_name,email" },
+      session?.access_token,
+      12000
+    );
 
     if (profilesResponse.error) {
       setMessage(`Não foi possível carregar os alunos: ${profilesResponse.error.message}`);
@@ -47,7 +57,7 @@ export default function AdminResults() {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [session]);
 
   const studentSummaries = useMemo(() => {
     const profileMap = new Map(profiles.map((profile) => [profile.id, profile]));

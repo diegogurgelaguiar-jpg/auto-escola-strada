@@ -2,6 +2,7 @@
 import { Link } from "react-router-dom";
 import { KeyRound, X } from "lucide-react";
 import { hasSupabaseConfig, supabase } from "../lib/supabase";
+import { selectRows } from "../lib/supabaseRest";
 import { useAuth } from "../state/AuthContext";
 
 export default function AdminUsers() {
@@ -37,10 +38,12 @@ export default function AdminUsers() {
     setLoading(true);
     setMessage("");
 
-    const usersResponse = await supabase
-      .from("profiles")
-      .select("*")
-      .order("created_at", { ascending: false });
+    const usersResponse = await selectRows(
+      "profiles",
+      { order: "created_at.desc" },
+      session?.access_token,
+      12000
+    );
 
     if (usersResponse.error) {
       setMessage(`Não foi possível carregar os usuários: ${usersResponse.error.message}`);
@@ -48,10 +51,12 @@ export default function AdminUsers() {
       return;
     }
 
-    const attemptsResponse = await supabase
-      .from("quiz_attempts")
-      .select("*")
-      .order("created_at", { ascending: false });
+    const attemptsResponse = await selectRows(
+      "quiz_attempts",
+      { order: "created_at.desc" },
+      session?.access_token,
+      12000
+    );
 
     if (attemptsResponse.error) {
       setMessage(`Os usuários foram carregados, mas os resultados falharam: ${attemptsResponse.error.message}`);
@@ -67,7 +72,7 @@ export default function AdminUsers() {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [session]);
 
   const filteredUsers = useMemo(() => {
     const term = search.trim().toLowerCase();
