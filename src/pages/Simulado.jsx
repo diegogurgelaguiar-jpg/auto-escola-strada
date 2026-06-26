@@ -17,6 +17,7 @@ export default function Simulado() {
   const [finished, setFinished] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [starting, setStarting] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const [quizMessage, setQuizMessage] = useState("");
 
@@ -26,50 +27,67 @@ export default function Simulado() {
   );
 
   async function startQuiz() {
+    if (starting) return;
+
     setQuizMessage("");
-    let source = demoQuestions;
+    setStarting(true);
 
-    if (hasSupabaseConfig) {
-      let query = supabase
-        .from("questions")
-        .select("*")
-        .eq("is_active", true);
+    try {
+      let source = demoQuestions;
+      let fallbackMessage = "";
 
-      if (mode === "categoria") {
-        query = query.eq("category", category);
+      if (hasSupabaseConfig) {
+        let query = supabase
+          .from("questions")
+          .select("*")
+          .eq("is_active", true);
+
+        if (mode === "categoria") {
+          query = query.eq("category", category);
+        }
+
+        const { data, error } = await query;
+
+        if (error) {
+          fallbackMessage = "Nao conseguimos carregar as perguntas online agora. Iniciamos com perguntas de treino.";
+        } else if (data?.length) {
+          source = data;
+        } else {
+          fallbackMessage = "Nenhuma pergunta online foi encontrada para este modo. Iniciamos com perguntas de treino.";
+        }
+      } else if (mode === "categoria") {
+        source = demoQuestions.filter((q) => q.category === category);
       }
 
-      const { data, error } = await query;
+      if (fallbackMessage) {
+        const categoryFallback = demoQuestions.filter((q) => q.category === category);
+        source = mode === "categoria" && categoryFallback.length
+          ? categoryFallback
+          : demoQuestions;
+      }
 
-      if (error) {
-        setQuizMessage(`Não foi possível carregar as perguntas: ${error.message}`);
+      const size = getQuizSize(mode);
+      const uniqueSource = getUniqueQuestions(shuffle(source));
+      const quizQuestions = uniqueSource.slice(0, size);
+
+      if (quizQuestions.length === 0) {
+        setQuizMessage("Nenhuma pergunta diferente foi encontrada para este modo.");
         return;
       }
 
-      source = data || [];
-    } else if (mode === "categoria") {
-      source = demoQuestions.filter(
-        (q) => q.category === category
-      );
+      setQuestions(quizQuestions);
+      setAnswers({});
+      setFinished(false);
+      setSaved(false);
+      setSaving(false);
+      setSaveMessage("");
+      setQuizMessage(fallbackMessage);
+      setStarted(true);
+    } catch (error) {
+      setQuizMessage(`Nao foi possivel iniciar o simulado: ${error.message}`);
+    } finally {
+      setStarting(false);
     }
-
-    const size = getQuizSize(mode);
-
-    const uniqueSource = getUniqueQuestions(shuffle(source));
-    const quizQuestions = uniqueSource.slice(0, size);
-
-    if (quizQuestions.length === 0) {
-      setQuizMessage("Nenhuma pergunta diferente foi encontrada para este modo.");
-      return;
-    }
-
-    setQuestions(quizQuestions);
-    setAnswers({});
-    setFinished(false);
-    setSaved(false);
-    setSaving(false);
-    setSaveMessage("");
-    setStarted(true);
   }
 
   async function finishQuiz() {
@@ -157,8 +175,9 @@ export default function Simulado() {
           <button
             className="btn primary"
             onClick={startQuiz}
+            disabled={starting}
           >
-            Iniciar simulado
+            {starting ? "Carregando perguntas..." : "Iniciar simulado"}
           </button>
 
           {quizMessage && <p className="message">{quizMessage}</p>}
