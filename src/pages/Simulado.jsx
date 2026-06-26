@@ -6,6 +6,17 @@ import { calculateScore, getQuizSize, getUniqueQuestions, shuffle } from "../lib
 import { getQuestionImage } from "../lib/questionImages";
 import { useAuth } from "../state/AuthContext";
 
+const QUIZ_LOAD_TIMEOUT_MS = 4500;
+
+function withTimeout(promise, timeoutMs) {
+  return Promise.race([
+    promise,
+    new Promise((resolve) => {
+      window.setTimeout(() => resolve({ data: null, error: null, timedOut: true }), timeoutMs);
+    })
+  ]);
+}
+
 export default function Simulado() {
   const { session } = useAuth();
 
@@ -46,9 +57,11 @@ export default function Simulado() {
           query = query.eq("category", category);
         }
 
-        const { data, error } = await query;
+        const { data, error, timedOut } = await withTimeout(query, QUIZ_LOAD_TIMEOUT_MS);
 
-        if (error) {
+        if (timedOut) {
+          fallbackMessage = "A busca online demorou mais que o esperado. Iniciamos com perguntas de treino.";
+        } else if (error) {
           fallbackMessage = "Nao conseguimos carregar as perguntas online agora. Iniciamos com perguntas de treino.";
         } else if (data?.length) {
           source = data;
