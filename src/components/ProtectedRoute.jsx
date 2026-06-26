@@ -1,9 +1,10 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../state/AuthContext";
 
 export function ProtectedRoute({ children }) {
   const { session, loading } = useAuth();
+  const location = useLocation();
 
   if (session) {
     return children;
@@ -17,11 +18,12 @@ export function ProtectedRoute({ children }) {
     );
   }
 
-  return <Navigate to="/login" replace />;
+  return <Navigate to="/login" replace state={{ from: location }} />;
 }
 
 export function AdminRoute({ children }) {
   const { session, loading, isAdmin } = useAuth();
+  const location = useLocation();
 
   // Loading geral
   if (loading) {
@@ -34,7 +36,7 @@ export function AdminRoute({ children }) {
 
   // Sem login
   if (!session) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
   // Não é admin

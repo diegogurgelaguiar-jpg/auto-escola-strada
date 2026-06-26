@@ -1,18 +1,20 @@
 import { useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { hasSupabaseConfig, supabase } from "../lib/supabase";
 import { useAuth } from "../state/AuthContext";
 import Brand from "../components/Brand";
 
 export default function Login() {
   const { session, signIn } = useAuth();
+  const location = useLocation();
+  const redirectTo = location.state?.from?.pathname || "/aluno";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [recoverMode, setRecoverMode] = useState(false);
 
-  if (session) return <Navigate to="/aluno" replace />;
+  if (session) return <Navigate to={redirectTo} replace />;
 
   async function handleSubmit(event) {
     event.preventDefault();
