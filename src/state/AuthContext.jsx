@@ -82,16 +82,17 @@ export function AuthProvider({ children }) {
     }
 
     const { data: listener } = supabase.auth.onAuthStateChange(
-      async (_event, nextSession) => {
+      (_event, nextSession) => {
         setSession(nextSession || null);
+        setLoading(false);
 
         if (nextSession?.user?.id) {
-          await loadProfile(nextSession.user.id);
+          window.setTimeout(() => {
+            loadProfile(nextSession.user.id);
+          }, 0);
         } else {
           setProfile(null);
         }
-
-        setLoading(false);
       }
     );
 

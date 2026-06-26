@@ -6,7 +6,7 @@ import { calculateScore, getQuizSize, getUniqueQuestions, shuffle } from "../lib
 import { getQuestionImage } from "../lib/questionImages";
 import { useAuth } from "../state/AuthContext";
 
-const QUIZ_LOAD_TIMEOUT_MS = 4500;
+const QUIZ_LOAD_TIMEOUT_MS = 12000;
 
 function withTimeout(promise, timeoutMs) {
   return Promise.race([
@@ -45,7 +45,6 @@ export default function Simulado() {
 
     try {
       let source = demoQuestions;
-      let fallbackMessage = "";
 
       if (hasSupabaseConfig) {
         let query = supabase
@@ -60,23 +59,18 @@ export default function Simulado() {
         const { data, error, timedOut } = await withTimeout(query, QUIZ_LOAD_TIMEOUT_MS);
 
         if (timedOut) {
-          fallbackMessage = "A busca online demorou mais que o esperado. Iniciamos com perguntas de treino.";
-        } else if (error) {
-          fallbackMessage = "Nao conseguimos carregar as perguntas online agora. Iniciamos com perguntas de treino.";
-        } else if (data?.length) {
-          source = data;
-        } else {
-          fallbackMessage = "Nenhuma pergunta online foi encontrada para este modo. Iniciamos com perguntas de treino.";
+          setQuizMessage("A busca das perguntas demorou demais. Verifique a conexão e tente novamente.");
+          return;
         }
+
+        if (error) {
+          setQuizMessage(`Nao foi possivel carregar as perguntas do banco: ${error.message}`);
+          return;
+        }
+
+        source = data || [];
       } else if (mode === "categoria") {
         source = demoQuestions.filter((q) => q.category === category);
-      }
-
-      if (fallbackMessage) {
-        const categoryFallback = demoQuestions.filter((q) => q.category === category);
-        source = mode === "categoria" && categoryFallback.length
-          ? categoryFallback
-          : demoQuestions;
       }
 
       const size = getQuizSize(mode);
@@ -94,7 +88,7 @@ export default function Simulado() {
       setSaved(false);
       setSaving(false);
       setSaveMessage("");
-      setQuizMessage(fallbackMessage);
+      setQuizMessage("");
       setStarted(true);
     } catch (error) {
       setQuizMessage(`Nao foi possivel iniciar o simulado: ${error.message}`);

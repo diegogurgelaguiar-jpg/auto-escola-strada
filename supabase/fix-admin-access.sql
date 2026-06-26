@@ -38,6 +38,7 @@ revoke all on function public.is_admin() from public;
 grant execute on function public.is_admin() to authenticated;
 
 alter table public.profiles enable row level security;
+alter table public.questions enable row level security;
 alter table public.quiz_attempts enable row level security;
 
 drop policy if exists "profiles_select" on public.profiles;
@@ -67,7 +68,13 @@ create policy "attempts_select_own_admin"
 on public.quiz_attempts for select to authenticated
 using (user_id = auth.uid() or public.is_admin());
 
+drop policy if exists "questions_select_active" on public.questions;
+create policy "questions_select_active"
+on public.questions for select to authenticated
+using (is_active = true or public.is_admin());
+
 grant select, update on public.profiles to authenticated;
+grant select on public.questions to authenticated;
 grant select, insert on public.quiz_attempts to authenticated;
 
 commit;

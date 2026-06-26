@@ -2,6 +2,17 @@ import { useEffect, useState } from "react";
 import { hasSupabaseConfig, supabase } from "../lib/supabase";
 import { useAuth } from "../state/AuthContext";
 
+const RESULTS_LOAD_TIMEOUT_MS = 12000;
+
+function withTimeout(promise, timeoutMs) {
+  return Promise.race([
+    promise,
+    new Promise((resolve) => {
+      window.setTimeout(() => resolve({ data: null, error: null, timedOut: true }), timeoutMs);
+    })
+  ]);
+}
+
 export default function Results() {
   const { session } = useAuth();
   const [attempts, setAttempts] = useState([]);
@@ -18,11 +29,20 @@ export default function Results() {
       setLoading(true);
       setMessage("");
 
-      const { data, error } = await supabase
-        .from("quiz_attempts")
-        .select("*")
-        .eq("user_id", session.user.id)
-        .order("created_at", { ascending: false });
+      const { data, error, timedOut } = await withTimeout(
+        supabase
+          .from("quiz_attempts")
+          .select("*")
+          .eq("user_id", session.user.id)
+          .order("created_at", { ascending: false }),
+        RESULTS_LOAD_TIMEOUT_MS
+      );
+
+      if (timedOut) {
+        setMessage("A busca do historico demorou demais. Verifique a conexao e tente novamente.");
+        setLoading(false);
+        return;
+      }
 
       if (error) {
         setMessage(`Não foi possível carregar seu histórico: ${error.message}`);
