@@ -127,7 +127,7 @@ main { min-height: 70vh; overflow: hidden; }
 .category-strip { display: grid; grid-template-columns: repeat(5, 1fr); background: var(--ink); color: white; padding: 1.3rem 5vw; }
 .category-item { display: flex; align-items: center; justify-content: center; gap: .65rem; padding: .35rem 1rem; border-right: 1px solid rgba(255,255,255,.17); }
 .category-item:last-child { border-right: 0; }
-.category-item strong { display: grid; place-items: center; width: 38px; height: 38px; color: white; background: var(--red); border-radius: 50%; font-size: 1.05rem; }
+.category-item strong { display: grid; place-items: center; width: 38px; height: 38px; flex: 0 0 38px; color: white; background: var(--red); border-radius: 50%; font-size: 1.05rem; }
 .category-item span { font-size: .86rem; color: #ddd; font-weight: 650; }
 
 .section, .page { padding: clamp(4rem, 8vw, 7rem) 5vw; }
@@ -432,6 +432,9 @@ tbody tr:hover { background: var(--surface-soft); }
   .footer-links { grid-column: auto; }
   .user-table-card { overflow-x: auto; }
   .user-table { min-width: 850px; }
+  .results-summary-card { overflow-x: auto; }
+  .results-summary-table { min-width: 640px; }
+  .results-summary-table th, .results-summary-table td { padding: .85rem .75rem; }
 }
 
 @media (max-width: 560px) {
@@ -445,7 +448,10 @@ tbody tr:hover { background: var(--surface-soft); }
   .hero-logo-card img { width: 62px; height: 62px; }
   .actions .btn { width: 100%; }
   .hero-trust { display: grid; gap: .7rem; }
-  .category-strip { padding-inline: 2vw; }
+  .category-strip { display: flex; gap: 0; padding-inline: 4vw; scrollbar-width: thin; }
+  .category-item { flex: 0 0 auto; min-width: 132px; padding-inline: .8rem; }
+  .category-item strong { width: 38px; height: 38px; flex-basis: 38px; }
+  .category-item span { line-height: 1.25; }
   .service-grid, .grid.four { grid-template-columns: 1fr; }
   .fleet-card, .fleet-card img { min-height: 360px; }
   .fleet-note { border-radius: var(--radius); align-items: flex-start; text-align: left; }
@@ -462,6 +468,13 @@ tbody tr:hover { background: var(--surface-soft); }
   .sticky-actions { border-radius: 20px; flex-direction: column; align-items: stretch; }
   .result-summary { grid-template-columns: 1fr; gap: 1rem; }
   .result-percentage { width: 118px; }
+  .results-summary-table { min-width: 600px; }
+  .results-summary-table .col-student { width: 48%; }
+  .results-summary-table .col-total { width: 16%; }
+  .results-summary-table .col-score { width: 18%; }
+  .results-summary-table th { font-size: .66rem; line-height: 1.2; letter-spacing: .035em; }
+  .results-summary-table td { font-size: .88rem; }
+  .score-value { min-width: 44px; }
   .whatsapp-float span { display: none; }
   .whatsapp-float { width: 54px; height: 54px; justify-content: center; padding: 0; }
   .footer-links { flex-direction: column; }
