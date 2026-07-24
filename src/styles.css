@@ -376,7 +376,9 @@ tbody tr:hover { background: var(--surface-soft); }
 .legal p, .legal li { color: var(--muted); line-height: 1.75; }
 .legal ul { display: grid; gap: .45rem; padding-left: 1.3rem; }
 .legal a { color: var(--red); font-weight: 750; }
-.whatsapp-float { position: fixed; right: 1rem; bottom: 1rem; z-index: 45; display: flex; align-items: center; gap: .45rem; color: white; background: #128c4a; border-radius: 999px; padding: .9rem 1.05rem; font-weight: 750; box-shadow: 0 7px 20px rgba(0,0,0,.16); }
+.whatsapp-float { position: fixed; right: 1rem; bottom: 1rem; z-index: 45; display: flex; align-items: center; gap: .5rem; color: white; background: #25d366; border-radius: 999px; padding: .78rem 1rem .78rem .82rem; font-weight: 750; box-shadow: 0 7px 20px rgba(0,0,0,.16); }
+.whatsapp-icon { width: 28px; height: 28px; flex: 0 0 28px; fill: currentColor; }
+.whatsapp-icon-phone { fill: #25d366; }
 
 .footer { display: grid; grid-template-columns: 1.4fr 1fr .55fr; gap: clamp(2rem, 5vw, 5rem); padding: 4rem 5vw 3rem; color: #d3d3d5; background: var(--ink); }
 .footer .brand { color: white; }

@@ -1,9 +1,26 @@
 import React, { useState } from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
-import { LogOut, MapPin, Menu, MessageCircle, Phone, X } from "lucide-react";
+import { LogOut, MapPin, Menu, Phone, X } from "lucide-react";
 import { useAuth } from "../state/AuthContext";
 import { siteConfig } from "../config/site";
 import Brand from "./Brand";
+
+function WhatsAppIcon() {
+  return (
+    <svg
+      className="whatsapp-icon"
+      viewBox="0 0 32 32"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="M16.02 3.5c-6.64 0-12.04 5.22-12.04 11.64 0 2.27.68 4.42 1.96 6.29L4.55 28.5l7.35-1.79a12.46 12.46 0 0 0 4.12.7c6.64 0 12.04-5.22 12.04-11.64S22.66 3.5 16.02 3.5Z" />
+      <path
+        className="whatsapp-icon-phone"
+        d="M12.53 9.62c-.26-.59-.53-.6-.78-.61h-.66c-.23 0-.6.09-.92.43-.32.35-1.21 1.19-1.21 2.9s1.24 3.36 1.42 3.59c.17.23 2.4 3.85 5.94 5.24 2.94 1.16 3.54.93 4.18.87.64-.06 2.07-.84 2.36-1.66.29-.81.29-1.51.2-1.66-.09-.14-.32-.23-.67-.4-.35-.17-2.07-1.02-2.39-1.13-.32-.12-.55-.17-.78.17-.23.35-.9 1.13-1.1 1.36-.2.23-.41.26-.75.09-.35-.17-1.47-.54-2.8-1.72-1.03-.92-1.73-2.05-1.93-2.4-.2-.35-.02-.54.15-.71.16-.16.35-.41.52-.61.17-.2.23-.35.35-.58.12-.23.06-.43-.03-.61-.09-.17-.77-1.89-1.08-2.56Z"
+      />
+    </svg>
+  );
+}
 
 export default function Layout() {
   const { session, isAdmin } = useAuth();
@@ -88,7 +105,7 @@ export default function Layout() {
         rel="noreferrer"
         aria-label="Falar com a Auto Escola Strada pelo WhatsApp"
       >
-        <MessageCircle size={20} />
+        <WhatsAppIcon />
         <span>WhatsApp</span>
       </a>
 
