@@ -21,9 +21,20 @@ export default function Login() {
     setMessage("");
 
     try {
-      const response = await signIn(email, password);
+      const normalizedEmail = email.trim().toLowerCase();
+      const response = await signIn(normalizedEmail, password);
 
       if (response.error) {
+        if (response.error.message === "Invalid login credentials") {
+          setMessage("E-mail ou senha inválidos. Confira se esse usuário foi cadastrado no Supabase.");
+          return;
+        }
+
+        if (response.error.message === "Email not confirmed") {
+          setMessage("Este e-mail ainda não foi confirmado no Supabase.");
+          return;
+        }
+
         setMessage(response.error.message);
         return;
       }
@@ -41,12 +52,14 @@ export default function Login() {
       return;
     }
 
-    if (!email) {
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!normalizedEmail) {
       setMessage("Digite seu e-mail para recuperar a senha.");
       return;
     }
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
       redirectTo: `${window.location.origin}/login`,
     });
 
