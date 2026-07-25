@@ -12,6 +12,31 @@ export default function AdminCreateUser() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
+  async function getFunctionMessage(error) {
+    try {
+      const context = error?.context;
+
+      if (context?.json) {
+        const body = await context.json();
+        return body?.error || body?.message || error.message;
+      }
+    } catch {
+      // Keep the original Supabase message when the error body is not JSON.
+    }
+
+    const rawMessage = String(error?.message || "");
+
+    if (/failed to send a request/i.test(rawMessage)) {
+      return "O serviço create-user não está publicado ou está bloqueado pelo CORS no Supabase.";
+    }
+
+    if (/non-2xx status code/i.test(rawMessage)) {
+      return "A função create-user recusou a criação. Verifique se o e-mail já existe e se sua conta tem perfil de administrador.";
+    }
+
+    return rawMessage || "Não foi possível acessar o serviço create-user.";
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
     setMessage("");
@@ -47,7 +72,7 @@ export default function AdminCreateUser() {
     setLoading(false);
 
     if (error) {
-      setMessage(error.message);
+      setMessage(await getFunctionMessage(error));
       return;
     }
 
