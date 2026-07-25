@@ -21,7 +21,10 @@ export default function AdminCreateUser() {
       return;
     }
 
-    if (!form.fullName || !form.email || !form.password) {
+    const normalizedName = form.fullName.trim();
+    const normalizedEmail = form.email.trim().toLowerCase();
+
+    if (!normalizedName || !normalizedEmail || !form.password) {
       setMessage("Preencha todos os campos.");
       return;
     }
@@ -35,8 +38,8 @@ export default function AdminCreateUser() {
 
     const { data, error } = await supabase.functions.invoke("create-user", {
       body: {
-        fullName: form.fullName,
-        email: form.email,
+        fullName: normalizedName,
+        email: normalizedEmail,
         password: form.password,
       },
     });
