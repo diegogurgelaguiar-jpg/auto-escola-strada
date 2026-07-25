@@ -39,6 +39,11 @@ export default function Login() {
         return;
       }
     } catch (error) {
+      if (error.message === "Failed to fetch") {
+        setMessage("Nao foi possivel conectar ao Supabase. Verifique se o projeto Supabase configurado ainda existe e esta ativo.");
+        return;
+      }
+
       setMessage(error.message);
     }
   }
