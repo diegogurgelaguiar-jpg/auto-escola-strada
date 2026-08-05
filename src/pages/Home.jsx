@@ -14,8 +14,6 @@ import { assetPath } from "../lib/assets";
 const categories = [
   ["A", "Moto"],
   ["B", "Carro"],
-  ["C", "Carga"],
-  ["D", "Passageiros"],
   ["E", "Veículos articulados"],
 ];
 
@@ -51,7 +49,7 @@ export default function Home() {
           <span className="eyebrow">Sua habilitação começa aqui</span>
           <h1>Aprenda com confiança. Dirija com segurança.</h1>
           <p>
-            Formação completa para categorias A, B, C, D e E, instrutores experientes
+            Formação completa para categorias A, B e E, instrutores experientes
             e acompanhamento de verdade em cada etapa da sua CNH.
           </p>
           <div className="actions">
@@ -76,7 +74,7 @@ export default function Home() {
           />
           <div className="hero-logo-card">
             <img src={assetPath("/images/logo-auto-escola-strada.jpg")} alt="Auto Escola Strada" width="92" height="92" />
-            <span><strong>Categorias A a E</strong>Uma escola para todas as suas conquistas.</span>
+            <span><strong>Categorias A, B e E</strong>Uma escola para suas principais conquistas.</span>
           </div>
         </div>
       </section>
@@ -109,8 +107,8 @@ export default function Home() {
           </article>
           <article className="feature-card">
             <Trophy />
-            <h3>Da categoria A à E</h3>
-            <p>Formação para motos, carros e veículos profissionais em um só lugar.</p>
+            <h3>Categorias A, B e E</h3>
+            <p>Formação para motos, carros e veículos articulados em um só lugar.</p>
           </article>
         </div>
       </section>

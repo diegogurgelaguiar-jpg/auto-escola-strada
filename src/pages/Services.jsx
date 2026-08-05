@@ -1,11 +1,9 @@
-import { Bike, BusFront, CarFront, GraduationCap, RefreshCcw, Truck } from "lucide-react";
+import { Bike, CarFront, GraduationCap, RefreshCcw, Truck } from "lucide-react";
 import { assetPath } from "../lib/assets";
 
 const services = [
   [Bike, "Categoria A", "Formação para motocicleta com pista própria. Você treina e realiza o exame no mesmo local."],
   [CarFront, "Categoria B", "Aulas práticas para automóvel com foco em controle, trânsito seguro e confiança ao volante."],
-  [Truck, "Categoria C", "Preparação para condução de veículos de carga com orientação profissional."],
-  [BusFront, "Categoria D", "Formação para conduzir veículos de passageiros com responsabilidade e segurança."],
   [Truck, "Categoria E", "Treinamento para veículos articulados e combinações de maior porte."],
   [GraduationCap, "Primeira habilitação", "Acompanhamento em todas as etapas para quem vai conquistar a primeira CNH."],
   [RefreshCcw, "Adição e mudança", "Amplie sua habilitação com suporte para adicionar ou mudar de categoria."],
@@ -19,7 +17,7 @@ export default function Services() {
         <div>
           <span className="eyebrow">Nossos serviços</span>
           <h1>Formação para cada caminho.</h1>
-          <p>Da primeira habilitação às categorias profissionais, a Strada prepara você para dirigir com segurança.</p>
+          <p>Da primeira habilitação às categorias A, B e E, a Strada prepara você para dirigir com segurança.</p>
         </div>
         <img src={assetPath("/images/caminhao-auto-escola-strada.jpg")} alt="Veículo de treinamento para categorias profissionais" />
       </div>
